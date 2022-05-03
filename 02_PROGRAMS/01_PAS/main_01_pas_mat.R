@@ -22,7 +22,7 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 ################################################################################
 PathData <- '../../01_DATA'
 PathResults <- '../../03_RESULTS'
-PAS_Dir <- file.path(PathResults,'01_TEST_PAS_PIG')
+PAS_Dir <- file.path(PathResults,'01_TEST_PAS_MAT')
 dir.create(path = PAS_Dir,showWarnings = F,recursive = T)
 ################################################################################
 # repository where data are stored
@@ -35,7 +35,7 @@ load(PathLOPdb)
 # output directories for fig
 ################################################################################
 
-for (i in c("ANT","CHL","CAR")){
+for (i in c("LMA","EWT","N")){
   PAS_Dir_Fig <- file.path(PAS_Dir,'FIGURES',i)
   dir.create(path = PAS_Dir_Fig,showWarnings = F,recursive = T)
   
@@ -47,7 +47,7 @@ for (i in c("ANT","CHL","CAR")){
       ############################################################################
       # definition of the sampling step
       ############################################################################
-      wl<-seq(400,1000, by = pas)
+      wl<-seq(1000,2450, by = pas)
       lamb <- c(unlist(Reflectance[,1]))
       WLselect<-match(wl,lamb)
       lambda<-lamb[WLselect]
@@ -64,8 +64,9 @@ for (i in c("ANT","CHL","CAR")){
       pb <- progress::progress_bar$new(
         format = "PROSPECT inversion [:bar] :percent in :elapsedfull",
         total = length(Reflectance), clear = FALSE, width= 100)
-      
+      T1<-Sys.time()
       for (j in c(1:length(Reflectance))) {
+        
         DataFit<-FitSpectralData(SpecPROSPECT = SpecPROSPECT,
                                  lambda = SpecPROSPECT$lambda,
                                  Refl = matrix(unlist(Reflectance[[j]])),
@@ -78,12 +79,20 @@ for (i in c("ANT","CHL","CAR")){
                                                 Tran = DataFit$Tran,
                                                 PROSPECT_version = 'D',
                                                 Parms2Estimate = Parms2Estimate)
+        
         est=data.frame("CHL" = Invert_est$CHL,"CAR" = Invert_est$CAR,"ANT" = Invert_est$ANT,
                        "EWT" = Invert_est$EWT, "LMA" = Invert_est$LMA, "N" = Invert_est$N)
         parms_est_df=rbind(parms_est_df, est)
         pb$tick()
       }
+      
       parms_est_df<-parms_est_df[-c(1,2),]
+      
+      T2<-Sys.time()
+      Time<-as.numeric(T2-T1)
+      TIME<-data.frame("TIME"=Time)
+      parms_est_df<-cbind(parms_est_df,TIME)
+      
       filename<-paste(PAS_Dir,paste("/PAS=",pas,"nm.RData", sep=""), sep = "")
       save(parms_est_df,file = filename)
     }else{
@@ -92,30 +101,20 @@ for (i in c("ANT","CHL","CAR")){
     
     fileName = paste(PAS_Dir_Fig,paste("/PAS=",pas,"nm_",i,".png", sep=""), sep = "")
     
-    if(i=="CHL"){
-      scatter_inversion(target = Biochemistry$CHLa+Biochemistry$CHLb,
-                        estimate = parms_est_df$CHL,
+    if(i=="LMA"){
+      scatter_inversion(target = Biochemistry$LMA,
+                        estimate = parms_est_df$LMA,
                         Colors = "red", 
                         fileName = fileName, 
-                        Labs = list("Mesured CHL","Estimated CHL"),
+                        Labs = list("Mesured LMA","Estimated LMA"),
                         PlotStats = TRUE,
                         categories = "RT")
-    }else if(i=="ANT"){
-      scatter_inversion(target = Biochemistry$ANT_estimated,
-                        estimate = parms_est_df$ANT,
+    }else if(i=="EWT"){
+      scatter_inversion(target = Biochemistry$EWT,
+                        estimate = parms_est_df$EWT,
                         Colors = "red", 
                         fileName = fileName, 
-                        Labs = list("Mesured ANT","Estimated ANT"),
-                        PlotStats = TRUE,
-                        categories = "RT")
-    }else{
-      target=Biochemistry$CAR
-      estimate = parms_est_df$CAR
-      scatter_inversion(target = target,
-                        estimate = estimate,
-                        Colors = "red", 
-                        fileName = fileName, 
-                        Labs = list("Mesured CAR","Estimated CAR"),
+                        Labs = list("Mesured EWT","Estimated EWT"),
                         PlotStats = TRUE,
                         categories = "RT")
     }
