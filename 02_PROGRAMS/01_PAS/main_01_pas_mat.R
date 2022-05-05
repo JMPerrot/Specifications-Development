@@ -40,7 +40,7 @@ for (i in c("LMA","EWT","N")){
   dir.create(path = PAS_Dir_Fig,showWarnings = F,recursive = T)
   
   
-  List_pas<-c(1,2,3,4,5,10,15,20,25,30,35,40,45,50,60,70)#,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250)
+  List_pas<-c(1,2,3,4,5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,125,150,175,200,225,250)
   
   for (pas in List_pas) {
     if (!file.exists(paste(PAS_Dir,paste("/PAS=",pas,"nm.RData", sep=""), sep = ""))){
