@@ -16,8 +16,8 @@ library(prospect)
 library(data.table)
 library(ggplot2)
 library(ggpubr)
-source('../Libraries/Lib_Analysis_Inversion.R')
-source('../Libraries/Lib_Plots.R')
+source('Libraries/Lib_Analysis_Inversion.R')
+source('Libraries/Lib_Plots.R')
 
 # repository where data are stored
 gitlab_Rep <- 'https://gitlab.com/jbferet/myshareddata/raw/master/LOP/'
@@ -71,34 +71,34 @@ NRMSE<- get_performances_inversion(target = Biochemistry$CHLa+Biochemistry$CHLb,
                                    categories = T)[[3]]
 
 X<-data.frame(Biochemistry$CHLa+Biochemistry$CHLb,CHL_ALL)
-save(res,file = "../../03_RESULTS/REFERENCE/REF#1.RData")
+save(res,file = "../03_RESULTS/REFERENCE/REF#1.RData")
 
 CHL_1 = scatter_inversion(target = Biochemistry$CHLa+Biochemistry$CHLb,
                           estimate = CHL_ALL,
                           Colors = "#66CC00",
                           Labs = c("Mesured CHL (µg/cm²)","Estimated CHL (µg/cm²)"),
-                          fileName = "../../03_RESULTS/REFERENCE/FIG/CHL_REF#1.png",
+                          fileName = "../03_RESULTS/REFERENCE/FIG/CHL_REF#1.png",
                           categories = "RT_FS",
                           PlotStats = T)
 CAR_1 = scatter_inversion(target = Biochemistry$CAR,
                           estimate = CAR_ALL,
                           Colors = "orange",
                           Labs = c("Mesured CAR (µg/cm²)","Estimated CAR (µg/cm²)"),
-                          fileName = "../../03_RESULTS/REFERENCE/FIG/CAR_REF#1.png",
+                          fileName = "../03_RESULTS/REFERENCE/FIG/CAR_REF#1.png",
                           categories = "RT_FS",
                           PlotStats = T)
 LMA_1 = scatter_inversion(target = Biochemistry$LMA,
                           estimate = LMA_ALL,
                           Colors = "red",
                           Labs = c("Mesured LMA (g/cm²)","Estimated LMA (g/cm²)"),
-                          fileName = "../../03_RESULTS/REFERENCE/FIG/LMA_REF#1.png",
+                          fileName = "../03_RESULTS/REFERENCE/FIG/LMA_REF#1.png",
                           categories = "RT_FS",
                           PlotStats = T)
 EWT_1 = scatter_inversion(target = Biochemistry$EWT,
                           estimate = EWT_ALL,
                           Colors = "blue",
                           Labs = c("Mesured EWT (g/cm²)","Estimated EWT (g/cm²)"),
-                          fileName = "../../03_RESULTS/REFERENCE/FIG/EWT_REF#1.png",
+                          fileName = "../03_RESULTS/REFERENCE/FIG/EWT_REF#1.png",
                           categories = "RT_FS",
                           PlotStats = T)
 
@@ -126,7 +126,7 @@ plotREF1<- annotate_figure(plotREFa1,
                                               color = "black", 
                                               face = "bold", 
                                               size = 14))
-ggsave("../../03_RESULTS/REFERENCE/REF#1.png", plotREF1,device = "png")
+ggsave("../03_RESULTS/REFERENCE/REF#1.png", plotREF1,device = "png")
 ################################################################################
 
 # Estimate all parameters for PROSPECT-D
@@ -144,12 +144,12 @@ EWT_OPT <- ParmEst$EWT
 LMA_OPT <- ParmEst$LMA
 
 
-save(ParmEst,file = "../../03_RESULTS/REFERENCE/REF#2.RData")
+save(ParmEst,file = "../03_RESULTS/REFERENCE/REF#2.RData")
 
 CHL_2 = scatter_inversion(target = Biochemistry$CHLa+Biochemistry$CHLb,
                           estimate = CHL_OPT,
                           Colors = "#66CC00",
-                          fileName = "../../03_RESULTS/REFERENCE/FIG/CHL_REF#2.png",
+                          fileName = "../03_RESULTS/REFERENCE/FIG/CHL_REF#2.png",
                           Labs = list("Mesured CHL (µg/cm²)","Estimated CHL (µg/cm²)"),
                           PlotStats = TRUE,
                           categories = "RT_OPT")
@@ -157,21 +157,21 @@ CAR_2 = scatter_inversion(target = Biochemistry$CAR,
                           estimate = CAR_OPT,
                           Colors = "orange",
                           Labs = c("Mesured CAR (µg/cm²)","Estimated CAR (µg/cm²)"),
-                          fileName = "../../03_RESULTS/REFERENCE/FIG/CAR_REF#2.png",
+                          fileName = "../03_RESULTS/REFERENCE/FIG/CAR_REF#2.png",
                           categories = "RT_OPT",
                           PlotStats = T)
 LMA_2 = scatter_inversion(target = Biochemistry$LMA,
                           estimate = LMA_OPT,
                           Colors = "red",
                           Labs = c("Mesured LMA (g/cm²)","Estimated LMA (g/cm²)"),
-                          fileName = "../../03_RESULTS/REFERENCE/FIG/LMA_REF#2.png",
+                          fileName = "../03_RESULTS/REFERENCE/FIG/LMA_REF#2.png",
                           categories = "RT_OPT",
                           PlotStats = T)
 EWT_2 = scatter_inversion(target = Biochemistry$EWT,
                           estimate = EWT_OPT,
                           Colors = "blue",
                           Labs = c("Mesured EWT (g/cm²)","Estimated EWT (g/cm²)"),
-                          fileName = "../../03_RESULTS/REFERENCE/FIG/EWT_REF#2.png",
+                          fileName = "../03_RESULTS/REFERENCE/FIG/EWT_REF#2.png",
                           categories = "RT_OPT",
                           PlotStats = T)
 
@@ -200,4 +200,4 @@ plotREF2<- annotate_figure(plotREFa2,
                                               face = "bold", 
                                               size = 14))
 
-ggsave("../../03_RESULTS/REFERENCE/REF#2.png", plotREF2,device = "png")
+ggsave("../03_RESULTS/REFERENCE/REF#2.png", plotREF2,device = "png")

@@ -31,20 +31,20 @@ scatter_inversion <- function(target, estimate, Colors, Labs, fileName,
                               categories=FALSE,
                               MinMaxAxis = FALSE,
                               PlotStats = FALSE){
-
+  
   # produce dataframe from input data
   input_df <- data.frame('target' = target,
                          'estimate' = estimate,
                          'categories' = categories)
   minmax <- c(min(c(target,estimate),na.rm = T),
               max(c(target,estimate),na.rm = T))
-
+  
   if (isFALSE(MinMaxAxis[1])){
     MinMaxAxis <- minmax
   }
   # produce main plot
   Splot <- ggplot(input_df, aes(x=target, y=estimate, group=categories)) +
-    geom_point(aes(pch = categories, color = categories,size=1, stroke = 0.5)) +
+    geom_point(aes(pch = categories, color = categories,size=0.15, stroke = 0.25)) +
     xlim(MinMaxAxis[1], MinMaxAxis[2]) +
     ylim(MinMaxAxis[1], MinMaxAxis[2]) +
     scale_color_manual(values=Colors) +
@@ -52,17 +52,17 @@ scatter_inversion <- function(target, estimate, Colors, Labs, fileName,
     labs(x=Labs[1],y=Labs[2]) +
     theme_bw() +
     theme(aspect.ratio=1,
-          legend.position="bottom",
-          legend.title = element_text(color = "white"),
-          legend.text = element_text(size = 15),
-          axis.text = element_text(size=15),
-          axis.title.x = element_text(size=16, face="bold"),
-          axis.title.y = element_text(size=16, face="bold")) +
-    guides(fill=guide_legend(nrow = 2),size = "none")
-
+          legend.position= "none")#,"bottom",
+  #legend.title = element_text(color = "white"),
+  #       legend.text = element_text(size = 5),
+  #       axis.text = element_text(size=10),
+  #       axis.title.x = element_text(size=10, face="bold"),
+  #       axis.title.y = element_text(size=10, face="bold")) +
+  # guides(fill=guide_legend(nrow = 2),size = "none")
+  
   # Add 1:1 line
-  Splot <- Splot + geom_abline(slope = 1, intercept = 0,linetype='dashed',size=1.25)
-
+  Splot <- Splot + geom_abline(slope = 1, intercept = 0,linetype='dashed',size=0.75)
+  
   # include statistics in the figure
   if (PlotStats == TRUE){
     nbCases <- length(unique(input_df$categories))
@@ -77,18 +77,18 @@ scatter_inversion <- function(target, estimate, Colors, Labs, fileName,
       Splot <- Splot + annotate(geom = "text",
                                 x = MinMaxAxis[1] +0.02*(MinMaxAxis[2]-MinMaxAxis[1]),
                                 y = MinMaxAxis[1] +(1.05-(0.07*case))*(MinMaxAxis[2]-MinMaxAxis[1]),
-                                label = my.label.expr, parse = TRUE, hjust = 0,size=8, col=Colors[case], fontface="bold")
-
+                                label = my.label.expr, parse = TRUE, hjust = 0,size=3, col="black")#Colors[case], fontface="bold")
+      
       my.label.expr = paste0("italic(NRMSE) == ", as.numeric(format(round(Stats$NRMSE[case], 2), nsmall = 2)))
       Splot <- Splot + annotate(geom = "text",
-                                x = MinMaxAxis[1] +0.3*(MinMaxAxis[2]-MinMaxAxis[1]),
-                                y = MinMaxAxis[1] +(1.05-(0.07*case))*(MinMaxAxis[2]-MinMaxAxis[1]),
-                                label = my.label.expr, parse = TRUE, hjust = 0, size=8, col=Colors[case], fontface="bold")
+                                x = MinMaxAxis[1] +0.02*(MinMaxAxis[2]-MinMaxAxis[1]),
+                                y = MinMaxAxis[1] +(1.05-(0.17*case))*(MinMaxAxis[2]-MinMaxAxis[1]),
+                                label = my.label.expr, parse = TRUE, hjust = 0, size=3, col= "black")#Colors[case], fontface="bold")
     }
   }
   # get iamge format
   ext_figure <- tools::file_ext(fileName)
   ggsave(filename = fileName, plot = Splot, device = ext_figure, path = NULL,
          scale = 1, width = 8, height = 8, units = "in", dpi = 600)
-  return(invisible())
+  return(invisible(Splot))
 }
