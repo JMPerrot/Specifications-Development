@@ -18,7 +18,7 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 ################################################################################
 # results data paths
 ################################################################################
-pathdata1 <- "../../03_RESULTS/01_TEST_PAS_MAT/PAS="
+pathdata1 <- "../../03_RESULTS/01_TEST_PAS/01_TEST_PAS_MAT/PAS="
 pathdata3 <- "nm.RData"
 
 ################################################################################
@@ -63,7 +63,7 @@ plotLMA <- ggplot(nrmse_dfLMA, aes(x = var, y = nrmse)) +
   geom_line(aes(x = var, y = nrmse), colour = "black", size = 1) +
   geom_line(aes(x = var, y = (1-r2)*100), colour = "red", size = 1, linetype = "3313")+
   
-  scale_y_continuous("NRMSE (red) & 1-R² (black) (%)")+
+  scale_y_continuous("NRMSE (black -) & 1-R² (red .-) (%)")+
   scale_x_continuous("STEP_LMA (nm)")+
   theme(
     axis.title.y.left=element_text(color="black"),
@@ -71,7 +71,7 @@ plotLMA <- ggplot(nrmse_dfLMA, aes(x = var, y = nrmse)) +
     axis.title.y.right=element_text(color="red"),
     axis.text.y.right=element_text(color="red"))
 
-filename = file.path('../../03_RESULTS/01_TEST_PAS_MAT/NRMSE_LMA_standard_pas.png')
+filename = file.path('../../03_RESULTS/01_TEST_PAS/NRMSE_LMA_standard_pas.png')
 ggsave(filename,plot = plotLMA, device = "png", path = NULL,
        scale = 1, width = 20, height = 13, units = "cm",
        dpi = 600)
@@ -80,14 +80,14 @@ plotEWT <- ggplot(nrmse_dfEWT, aes(x = var, y = nrmse)) +
   geom_line(aes(x = var, y = nrmse), colour = "black", size = 1) +
   geom_line(aes(x = var, y =(1-r2)*100), colour = "red", size = 1, linetype = "3313")+
   
-  scale_y_continuous("NRMSE (red) & 1-R² (black) (%)")+
+  scale_y_continuous("NRMSE (black -) & 1-R² (red .-) (%)")+
   scale_x_continuous("STEP_EWT (nm)")+
   theme(
     axis.title.y.left=element_text(color="black"),
     axis.text.y.left=element_text(color="black"),
     axis.title.y.right=element_text(color="red"),
     axis.text.y.right=element_text(color="red"))
-filename = file.path('../../03_RESULTS/01_TEST_PAS_MAT/NRMSE_EWT_standard_pas.png')
+filename = file.path('../../03_RESULTS/01_TEST_PAS/NRMSE_EWT_standard_pas.png')
 ggsave(filename,plot = plotEWT, device = "png", path = NULL,
        scale = 1, width = 20, height = 13, units = "cm",
        dpi = 600)
