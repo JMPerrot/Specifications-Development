@@ -47,7 +47,7 @@ for (i in c("LMA","EWT","N")){
       ############################################################################
       # definition of the sampling step
       ############################################################################
-      wl<-seq(1000,2450, by = pas)
+      wl<-seq(1300,2450, by = pas)
       lamb <- c(unlist(Reflectance[,1]))
       WLselect<-match(wl,lamb)
       lambda<-lamb[WLselect]

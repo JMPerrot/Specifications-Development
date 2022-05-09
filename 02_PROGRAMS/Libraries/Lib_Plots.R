@@ -44,7 +44,7 @@ scatter_inversion <- function(target, estimate, Colors, Labs, fileName,
   }
   # produce main plot
   Splot <- ggplot(input_df, aes(x=target, y=estimate, group=categories)) +
-    geom_point(aes(pch = categories, color = categories,size=0.15, stroke = 0.25)) +
+    geom_point(aes(pch = categories, color = categories,size=0.15, stroke = 0.25), size = 1.5) +
     xlim(MinMaxAxis[1], MinMaxAxis[2]) +
     ylim(MinMaxAxis[1], MinMaxAxis[2]) +
     scale_color_manual(values=Colors) +

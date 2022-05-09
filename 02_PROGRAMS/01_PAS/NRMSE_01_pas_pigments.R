@@ -18,7 +18,7 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 # results data paths
 ################################################################################
 pathdata1 <- "../../03_RESULTS/01_TEST_PAS_PIG/PAS="
-pathdata3 <- "nm.RData"
+extention <- "nm.RData"
 
 ################################################################################
 # initialization
@@ -29,9 +29,9 @@ nrmse_dfLMA = data.frame("var"=NA, "nrmse" = NA)
 nrmse_dfEWT = data.frame("var"=NA, "nrmse" = NA)
 
 for (i in c(1,2,3,4,5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,125,150,175,200,225,250)) {
-  pathdata2 <- as.character(i)
-  pathdata01 <- paste(pathdata1,pathdata2,sep = "")
-  pathdata02 <- paste(pathdata01,pathdata3, sep = "")
+  pas <- as.character(i)
+  pathdata01 <- paste(pathdata1,pas,sep = "")
+  pathdata02 <- paste(pathdata01,extention, sep = "")
   load(pathdata02)
   
   NRMSECHL = as.numeric(get_performances_inversion(target = Biochemistry$CHLa+Biochemistry$CHLb, 
