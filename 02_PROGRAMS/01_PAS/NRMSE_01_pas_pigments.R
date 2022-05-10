@@ -54,37 +54,7 @@ for (i in c(1,2,3,4,5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,125,150,175,200
 }
 nrmse_dfCHL <- nrmse_dfCHL[-c(1),]
 nrmse_dfCAR <- nrmse_dfCAR[-c(1),]
+nrmse_pig<-data.frame("CHL" <- nrmse_dfCHL, "CAR" <- nrmse_dfCAR)
+save(nrmse_pig, file = "../../03_RESULTS/01_TEST_PAS/nrmse_pig.RData")
 
 
-
-plotCHL <- ggplot(nrmse_dfCHL, aes(x = var, y = nrmse)) +
-  geom_line(aes(x = var, y = nrmse), colour = "black", size = 1) +
-  geom_line(aes(x = var, y =(1-r2)*100), colour = "red", size = 1, linetype = "3313")+
-  
-  scale_y_continuous("NRMSE (black -) & 1-R² (red .-) (%)")+
-  scale_x_continuous("STEP_CHL (nm)")+
-  theme(
-    axis.title.y.left=element_text(color="black"),
-    axis.text.y.left=element_text(color="black"),
-    axis.title.y.right=element_text(color="red"),
-    axis.text.y.right=element_text(color="red"))
-filename = file.path('../../03_RESULTS/01_TEST_PAS/NRMSE_CHL_standard_pas.png')
-ggsave(filename,plot = plotCHL, device = "png", path = NULL,
-       scale = 1, width = 20, height = 13, units = "cm",
-       dpi = 600)
-
-plotCAR <- ggplot(nrmse_dfCAR, aes(x = var, y = nrmse)) +
-  geom_line(aes(x = var, y = nrmse), colour = "black", size = 1) +
-  geom_line(aes(x = var, y =(1-r2)*100), colour = "red", size = 1, linetype = "3313")+
-  
-  scale_y_continuous("NRMSE (black -) & 1-R² (red .-) (%)")+
-  scale_x_continuous("STEP_CAR (nm)")+
-  theme(
-    axis.title.y.left=element_text(color="black"),
-    axis.text.y.left=element_text(color="black"),
-    axis.title.y.right=element_text(color="red"),
-    axis.text.y.right=element_text(color="red"))
-filename = file.path('../../03_RESULTS/01_TEST_PAS/NRMSE_CAR_standard_pas.png')
-ggsave(filename,plot = plotCAR, device = "png", path = NULL,
-       scale = 1, width = 20, height = 13, units = "cm",
-       dpi = 600)

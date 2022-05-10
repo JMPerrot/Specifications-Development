@@ -53,42 +53,7 @@ for (i in c(1,2,3,4,5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,125,150,175,200
 
 nrmse_dfLMA <- nrmse_dfLMA[-c(1),]
 nrmse_dfEWT <- nrmse_dfEWT[-c(1),]
+nrmse_mat<-data.frame("EWT" <- nrmse_dfEWT, "LMA" <- nrmse_dfLMA)
+save(nrmse_mat, file = "../../03_RESULTS/01_TEST_PAS/nrmse_mat.RData")
 
-################################################################################
-# Plots
-################################################################################
-
-
-plotLMA <- ggplot(nrmse_dfLMA, aes(x = var, y = nrmse)) +
-  geom_line(aes(x = var, y = nrmse), colour = "black", size = 1) +
-  geom_line(aes(x = var, y = (1-r2)*100), colour = "red", size = 1, linetype = "3313")+
-  
-  scale_y_continuous("NRMSE (black -) & 1-R² (red .-) (%)")+
-  scale_x_continuous("STEP_LMA (nm)")+
-  theme(
-    axis.title.y.left=element_text(color="black"),
-    axis.text.y.left=element_text(color="black"),
-    axis.title.y.right=element_text(color="red"),
-    axis.text.y.right=element_text(color="red"))
-
-filename = file.path('../../03_RESULTS/01_TEST_PAS/NRMSE_LMA_standard_pas.png')
-ggsave(filename,plot = plotLMA, device = "png", path = NULL,
-       scale = 1, width = 20, height = 13, units = "cm",
-       dpi = 600)
-
-plotEWT <- ggplot(nrmse_dfEWT, aes(x = var, y = nrmse)) +
-  geom_line(aes(x = var, y = nrmse), colour = "black", size = 1) +
-  geom_line(aes(x = var, y =(1-r2)*100), colour = "red", size = 1, linetype = "3313")+
-  
-  scale_y_continuous("NRMSE (black -) & 1-R² (red .-) (%)")+
-  scale_x_continuous("STEP_EWT (nm)")+
-  theme(
-    axis.title.y.left=element_text(color="black"),
-    axis.text.y.left=element_text(color="black"),
-    axis.title.y.right=element_text(color="red"),
-    axis.text.y.right=element_text(color="red"))
-filename = file.path('../../03_RESULTS/01_TEST_PAS/NRMSE_EWT_standard_pas.png')
-ggsave(filename,plot = plotEWT, device = "png", path = NULL,
-       scale = 1, width = 20, height = 13, units = "cm",
-       dpi = 600)
 
