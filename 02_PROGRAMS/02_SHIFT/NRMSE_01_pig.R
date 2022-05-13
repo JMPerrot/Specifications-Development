@@ -60,8 +60,21 @@ nrmse_dfCAR <- nrmse_dfCAR[-c(1),]
 nrmse_pig<-data.frame("CHL" <- nrmse_dfCHL, "CAR" <- nrmse_dfCAR)
 save(nrmse_pig, file = paste("../../03_RESULTS/02_TEST_SHIFT/pas=",shift_max, "nm/nrmse_pig.RData", sep = ""))
 
-p<-ggplot(nrmse_dfCHL, aes(x = var, y = nrmse))+
+
+pCHL<-ggplot(nrmse_dfCHL, aes(x = var, y = nrmse))+
+  geom_line(aes(x = var, y = nrmse), size =1, color = "green")+
+  xlab("translation (nm)")+
+  ylab("NRMSE (%)")+    
+  annotate("text", x = 0, y = 100, label = paste("pas_",as.character(shift_max),"nm", sep = ""),
+           hjust = 0, parse = TRUE)
+
+ggsave(filename = paste("../../03_RESULTS/02_TEST_SHIFT/CHL_shift=",shift_max,"nm.png",sep = ""),plot = pCHL)
+
+pCAR<-ggplot(nrmse_dfCAR, aes(x = var, y = nrmse))+
   geom_line(aes(x = var, y = nrmse), size =1, color = "orange")+
   xlab("translation (nm)")+
-  ylab("NRMSE (%)")
-p
+  ylab("NRMSE (%)")+    
+  annotate("text", x = 0, y = 100, label = paste("pas_",as.character(shift_max),"nm", sep = ""),
+           hjust = 0, parse = TRUE)
+
+ggsave(filename = paste("../../03_RESULTS/02_TEST_SHIFT/CAR_shift=",shift_max,"nm.png",sep = ""),plot = pCAR)
