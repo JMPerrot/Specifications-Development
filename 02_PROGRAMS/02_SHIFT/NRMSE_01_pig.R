@@ -17,7 +17,7 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 ################################################################################
 # results data paths
 ################################################################################
-shift_max = 100
+shift_max = 175
 
 pathdata1 <- paste("../../03_RESULTS/02_TEST_SHIFT/pas=",shift_max,"nm/SHIFT=", sep = "")
 extention <- "nm.RData"
@@ -62,10 +62,10 @@ save(nrmse_pig, file = paste("../../03_RESULTS/02_TEST_SHIFT/pas=",shift_max, "n
 
 
 pCHL<-ggplot(nrmse_dfCHL, aes(x = var, y = nrmse))+
-  geom_line(aes(x = var, y = nrmse), size =1, color = "green")+
+  geom_line(aes(x = var, y = nrmse), size =1, color = "#009900")+
   xlab("translation (nm)")+
   ylab("NRMSE (%)")+    
-  annotate("text", x = 0, y = 100, label = paste("pas_",as.character(shift_max),"nm", sep = ""),
+  annotate("text", x = 10, y = min(nrmse_dfCHL$nrmse), label = paste("pas_",as.character(shift_max),"nm", sep = ""),
            hjust = 0, parse = TRUE)
 
 ggsave(filename = paste("../../03_RESULTS/02_TEST_SHIFT/CHL_shift=",shift_max,"nm.png",sep = ""),plot = pCHL)
@@ -74,7 +74,7 @@ pCAR<-ggplot(nrmse_dfCAR, aes(x = var, y = nrmse))+
   geom_line(aes(x = var, y = nrmse), size =1, color = "orange")+
   xlab("translation (nm)")+
   ylab("NRMSE (%)")+    
-  annotate("text", x = 0, y = 100, label = paste("pas_",as.character(shift_max),"nm", sep = ""),
+  annotate("text", x = 10, y = min(nrmse_dfCAR$nrmse), label = paste("pas_",as.character(shift_max),"nm", sep = ""),
            hjust = 0, parse = TRUE)
 
 ggsave(filename = paste("../../03_RESULTS/02_TEST_SHIFT/CAR_shift=",shift_max,"nm.png",sep = ""),plot = pCAR)

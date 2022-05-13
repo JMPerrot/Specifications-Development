@@ -33,10 +33,11 @@ dbName <- 'ANGERS'
 PathLOPdb <- file.path(PathData,dbName,'LeafOptics.RData')
 load(PathLOPdb)
 
-pas <- 100
-shift_list <- c(0:pas)
+pas <- 300
+shift_list <- c(295:pas+5)
 
-SHIFT_Dir_Fig <- file.path(SHIFT_Dir,paste('FIGURES/CAR/CAR_',pas,'nm', sep =""))
+SHIFT_Dir_Fig_CAR <- file.path(SHIFT_Dir,paste('FIGURES/CAR/CAR_',pas,'nm', sep =""))
+SHIFT_Dir_Fig_CHL <- file.path(SHIFT_Dir,paste('FIGURES/CHL/CHL_',pas,'nm', sep =""))
 dir.create(path = SHIFT_Dir_Fig,showWarnings = F,recursive = T)
 #SHIFT_Dir_Data<-paste(SHIFT_Dir,paste("/pas=",pas,"nm/SHIFT=",shift,"nm",".RData", sep=""), sep = "")
 SHIFT_Dir_Data<-paste(SHIFT_Dir,paste("/pas=",pas,"nm", sep=""), sep = "")
@@ -96,12 +97,21 @@ for (shift in shift_list) {
     load(paste(SHIFT_Dir,paste("/pas=",pas,"nm/SHIFT=",shift,"nm",".RData", sep=""), sep = ""))
   }
   
-  fileName = paste(SHIFT_Dir_Fig,paste("/SHIFT=",shift,"nm_CAR.png", sep=""), sep = "")
+  fileNameCAR = paste(SHIFT_Dir_Fig_CAR,paste("/SHIFT=",shift,"nm_CAR.png", sep=""), sep = "")
   scatter_inversion(target = Biochemistry$CAR,
                     estimate = parms_est_df$CAR,
-                    Colors = "red", 
-                    fileName = fileName, 
+                    Colors = "orange", 
+                    fileName = fileNameCAR, 
                     Labs = list("Mesured CAR","Estimated CAR"),
+                    PlotStats = TRUE,
+                    categories = "RT")
+  
+  fileNameCHL = paste(SHIFT_Dir_Fig_CHL,paste("/SHIFT=",shift,"nm_CHL.png", sep=""), sep = "")
+  scatter_inversion(target = Biochemistry$CHLa+Biochemistry$CHLb,
+                    estimate = parms_est_df$CHL,
+                    Colors = "#009900", 
+                    fileName = fileNameCHL, 
+                    Labs = list("Mesured CHL","Estimated CHL"),
                     PlotStats = TRUE,
                     categories = "RT")
 }
