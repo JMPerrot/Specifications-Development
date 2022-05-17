@@ -17,7 +17,7 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 ################################################################################
 # results data paths
 ################################################################################
-shift_max = 175
+shift_max = 150
 
 pathdata1 <- paste("../../03_RESULTS/02_TEST_SHIFT/pas=",shift_max,"nm/SHIFT=", sep = "")
 extention <- "nm.RData"
