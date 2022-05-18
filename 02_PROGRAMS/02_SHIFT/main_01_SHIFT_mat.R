@@ -33,7 +33,7 @@ dbName <- 'ANGERS'
 PathLOPdb <- file.path(PathData,dbName,'LeafOptics.RData')
 load(PathLOPdb)
 
-pas <- 30
+pas <- 200
 shift_list <- c(0:pas)
 
 SHIFT_Dir_Fig_LMA <- file.path(SHIFT_Dir,paste('FIGURES/LMA/LMA_',pas,'nm', sep =""))
