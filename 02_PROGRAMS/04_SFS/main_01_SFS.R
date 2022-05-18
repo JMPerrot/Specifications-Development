@@ -72,7 +72,7 @@ InitValues$CHL <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01
 InitValues$CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 InitValues$EWT <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-    
+
 ################################################################################
 # Perform SFS reduce spectral information
 ################################################################################
@@ -160,31 +160,14 @@ for (parm in Parms2Estimate){
 for (parm in Parms2Estimate){
   ## Perform SFS on initial set of spectral bands listWL
   listWL <- seq(from = SpectralDomain[[parm]]$minWL,
-                        to = SpectralDomain[[parm]]$maxWL,
-                        by = Opt_Sampling[[parm]])
+                to = SpectralDomain[[parm]]$maxWL,
+                by = Opt_Sampling[[parm]])
   Last_WL <- which(is.na(match(listWL,DiscardedWL[[parm]])))
-  DataFit <- FitSpectralData(SpecPROSPECT = SpecPROSPECT,
-                             lambda = lambda,
-                             Refl = Reflectance,
-                             Tran = Transmittance,
-                             UserDomain = listWL[Last_WL],
-                             UL_Bounds = FALSE)
-  # perform PROSPECT inversion
-  Invert_est <- prospect::Invert_PROSPECT(SpecPROSPECT = DataFit$SpecPROSPECT,
-                                          Refl = DataFit$Refl,
-                                          Tran = DataFit$Tran,
-                                          PROSPECT_version = 'D',
-                                          Parms2Estimate = ParmsEstInv[[parm]],
-                                          InitValues = InitValues[[parm]],
-                                          progressBar = TRUE)
-  # compute performances for target parameter
-  Stats_inversion <- get_performances_inversion(target = Biochemistry[[parm]],
-                                                estimate = Invert_est[[parm]], 
-                                                categories= TRUE)
-  
   DiscardedWL[[parm]] <- c(DiscardedWL[[parm]],listWL[Last_WL])
-  Evol_NRMSE[[parm]] <- c(Evol_NRMSE[[parm]],Stats_inversion$NRMSE)
+  AllFeat <- Stats[[parm]]$NRMSE[which(Stats[[parm]]$Sampling==Opt_Sampling[[parm]])]
+  Evol_NRMSE[[parm]] <- c(AllFeat,Evol_NRMSE[[parm]])
 }
+
 
 for (parm in Parms2Estimate){
   df <- data.frame('Discarded_WL' = DiscardedWL[[parm]],
