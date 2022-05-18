@@ -65,7 +65,7 @@ InitValues$EWT_LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=
 # Perform inversion
 ################################################################################
 # for each parameter
-nbWorkers <- 8
+nbWorkers <- 4
 registerDoFuture()
 plan(multisession, workers = nbWorkers)
 Estimate_SpectralSampling <- list()
