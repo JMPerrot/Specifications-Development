@@ -156,16 +156,54 @@ for (parm in Parms2Estimate){
   plan(sequential)
 }
 
+# perform inversion for last spectral band
+for (parm in Parms2Estimate){
+  ## Perform SFS on initial set of spectral bands listWL
+  listWL <- seq(from = SpectralDomain[[parm]]$minWL,
+                        to = SpectralDomain[[parm]]$maxWL,
+                        by = Opt_Sampling[[parm]])
+  Last_WL <- which(is.na(match(listWL,DiscardedWL[[parm]])))
+  DataFit <- FitSpectralData(SpecPROSPECT = SpecPROSPECT,
+                             lambda = lambda,
+                             Refl = Reflectance,
+                             Tran = Transmittance,
+                             UserDomain = listWL[Last_WL],
+                             UL_Bounds = FALSE)
+  # perform PROSPECT inversion
+  Invert_est <- prospect::Invert_PROSPECT(SpecPROSPECT = DataFit$SpecPROSPECT,
+                                          Refl = DataFit$Refl,
+                                          Tran = DataFit$Tran,
+                                          PROSPECT_version = 'D',
+                                          Parms2Estimate = ParmsEstInv[[parm]],
+                                          InitValues = InitValues[[parm]],
+                                          progressBar = TRUE)
+  # compute performances for target parameter
+  Stats_inversion <- get_performances_inversion(target = Biochemistry[[parm]],
+                                                estimate = Invert_est[[parm]], 
+                                                categories= TRUE)
+  
+  DiscardedWL[[parm]] <- c(DiscardedWL[[parm]],listWL[Last_WL])
+  Evol_NRMSE[[parm]] <- c(Evol_NRMSE[[parm]],Stats_inversion$NRMSE)
+}
 
 for (parm in Parms2Estimate){
   df <- data.frame('Discarded_WL' = DiscardedWL[[parm]],
                    'NRMSE' = Evol_NRMSE[[parm]])
   filename <- file.path(SFS_Dir,paste(parm,'_FeatureSelection.csv',sep = ''))
   write_delim(x = df,
-              file = FileName,
+              file = filename,
               delim = '\t',
               col_names = T)
 }
+
+# for (parm in Parms2Estimate){
+#   filename <- file.path(SFS_Dir,paste(parm,'_FeatureSelection.csv',sep = ''))
+#   df <- read_delim(file = filename,
+#                    delim = '\t',
+#                    col_names = T)
+#   DiscardedWL[[parm]] <- df$Discarded_WL
+#   Evol_NRMSE[[parm]] <- df$NRMSE
+# }
 
 #   
 #   
