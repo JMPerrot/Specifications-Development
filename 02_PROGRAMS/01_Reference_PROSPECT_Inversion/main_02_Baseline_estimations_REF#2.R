@@ -25,7 +25,7 @@ source('../Libraries/Lib_Plots.R')
 # input output directories
 ################################################################################
 PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS/REFERENCE'
+PathResults <- '../../03_RESULTS/01_Reference'
 dir.create(PathResults,showWarnings = F,recursive = T)
 ################################################################################
 # repository where data are stored
