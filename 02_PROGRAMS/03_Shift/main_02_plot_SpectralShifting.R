@@ -23,7 +23,7 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 PathData <- '../../01_DATA'
 PathResults <- '../../03_RESULTS'
 Reference_Dir <- file.path(PathResults,'01_Reference')
-SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
+SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
 
 ################################################################################
 # load leaf optics dataset
@@ -47,18 +47,18 @@ for (parm in Parms2Estimate){
   load(FileName)
   Ref2 <- ResultsInversion
   # load inversion results for spectral samplings
-  FileName <- file.path(SpectralSampling_Dir,paste(parm,'_SpecSampling.csv',sep = ''))
+  FileName <- file.path(SpectralShifting_Dir,paste(parm,'_SpecSampling.csv',sep = ''))
   SpecSampling <- readr::read_delim(file = FileName,delim = '\t')
   
   # compute performances
   # ref#1
   Stats_inversion_Ref[[parm]] <- Stats_inversion_SS[[parm]] <- list()
   Stats_inversion_Ref[[parm]][['REF1']] <- get_performances_inversion(target = Ref1$measured,
-                                                              estimate = Ref1$estimated, 
-                                                              categories= TRUE)
+                                                                      estimate = Ref1$estimated, 
+                                                                      categories= TRUE)
   Stats_inversion_Ref[[parm]][['REF2']] <- get_performances_inversion(target = Ref2$measured,
-                                                              estimate = Ref2$estimated, 
-                                                              categories= TRUE)
+                                                                      estimate = Ref2$estimated, 
+                                                                      categories= TRUE)
   for (ss in colnames(SpecSampling)){
     Stats_inversion_SS[[parm]][[ss]] <- get_performances_inversion(target = Biochemistry[[parm]],
                                                                    estimate = SpecSampling[[ss]],
@@ -70,7 +70,7 @@ for (parm in Parms2Estimate){
 
 # save Statistics
 for (parm in names(Stats_inversion_SS)){
-  FileName <- file.path(SpectralSampling_Dir,paste(parm,'_Statistics.csv',sep = ''))
+  FileName <- file.path(SpectralShifting_Dir,paste(parm,'_Statistics.csv',sep = ''))
   write_delim(x = Stats_inversion_SS[[parm]],
               file = FileName,
               delim = '\t',
@@ -96,7 +96,7 @@ for (parm in Parms2Estimate){
     geom_abline(slope = 0, intercept = Stats_inversion_Ref[[parm]]$REF2$NRMSE,
                 linetype='dashed',size=1,col='green')
   
-  filename = file.path(SpectralSampling_Dir,paste('NRMSE_',parm,'_SpectralSampling.png',sep = ''))
+  filename = file.path(SpectralShifting_Dir,paste('NRMSE_',parm,'_SpectralShifting.png',sep = ''))
   ggsave(filename,plot = plot0[[parm]], device = "png", path = NULL,
          scale = 1, width = 20, height = 13, units = "cm",
          dpi = 600)
@@ -126,4 +126,4 @@ plot_nrmse<- annotate_figure(plot_nrmse1,
                                                 face = "bold", 
                                                 size = 14))
 
-ggsave(file.path(SpectralSampling_Dir,paste('NRMSE_ALL','_SpectralSampling.png',sep = '')), plot_nrmse,device = "png")
+ggsave(file.path(SpectralShifting_Dir,paste('NRMSE_ALL','_SpectralShifting.png',sep = '')), plot_nrmse,device = "png")

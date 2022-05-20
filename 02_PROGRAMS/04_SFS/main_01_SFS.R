@@ -188,23 +188,23 @@ for (parm in Parms2Estimate){
 #   Evol_NRMSE[[parm]] <- df$NRMSE
 # }
 
-#   
-#   
-#   
-#   
-# 
+#
+#
+#
+#
+#
 #   nbVars <- length(listWL)
 #   NumVar_list <- as.list(seq(1,length(AllVars)))
 #   ResVar0 <- as.list(seq(1,length(AllVars)))
-#   
-#   
+#
+#
 #   subfeatures_SFS <- function() {
 #     foreach(numvar = NumVar_list) %dopar% {
 #       SelectedVarsTmp <- c(SelectedVars,AllVars[[numvar]])
 #       ResVar0 <- lapply(X = Spectralpop,FUN = spectral_variance_subset,
 #                         vars = SelectedVarsTmp, stand='None',
 #                         var_crown = F,var_residu = F)
-#       
+#
 #       ResVar0 <- as.data.frame(do.call(rbind,(lapply(ResVar0,unlist)))[,1:2])
 #       Corr_tot0 <- cor.test(ResVar0$var_tot,
 #                             All_Populations_diversite$Shannon)$estimate
@@ -214,7 +214,7 @@ for (parm in Parms2Estimate){
 #     }
 #   }
 #   subSFS <- subfeatures_SFS()
-#   
+#
 #   ResVar[[nbvars2select]] <- lapply(subSFS,'[[',1)
 #   Corr_species[[nbvars2select]] <- matrix(unlist(lapply(subSFS,'[[',2)),ncol = 1)
 #   Corr_tot[[nbvars2select]]  <- matrix(unlist(lapply(subSFS,'[[',3)),ncol = 1)
@@ -227,19 +227,19 @@ for (parm in Parms2Estimate){
 #   # delete selected component from AllVars
 #   AllVars <- AllVars[-which(AllVars==WhichVar)]
 #   EvolCorr <- c(EvolCorr,max(Corr_tot[[nbvars2select]],na.rm = T))
-#   
-#   
-# 
-#   
-#   
-#     
+#
+#
+#
+#
+#
+#
 # }
-# 
-# 
-# 
-# 
-# 
-# 
+#
+#
+#
+#
+#
+#
 # 
 # 
 # 
