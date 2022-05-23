@@ -1,40 +1,41 @@
 ################################################################################
 ## This code summarizes the evolution of the performances of PROSPECT inversion
-## 
 ################################################################################
 # Always start a script with a clean environment
 rm(list=ls(all=TRUE));gc()
 # define working directory as the directory where the script is located
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
-################################################################################
-# Libraries required
-################################################################################
+
+## Libraries required ----------------------------------------------------------
+
 library(tidyverse)
 library(prospect)
 library(data.table)
 library(doFuture)
+library(ggplot2)
+
 source('../Libraries/Lib_Plots.R')
 source('../Libraries/Lib_Analysis_Inversion.R')
 
-################################################################################
-# input output directories
-################################################################################
+
+## Input output directories ----------------------------------------------------
+
 PathData <- '../../01_DATA'
 PathResults <- '../../03_RESULTS'
 Reference_Dir <- file.path(PathResults,'01_Reference')
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 
-################################################################################
-# load leaf optics dataset
-################################################################################
+
+## load leaf optics dataset ----------------------------------------------------
+
 dbName <- 'ANGERS'
 PathLOPdb <- file.path(PathData,dbName,'LeafOptics.RData')
 load(PathLOPdb)
 
-################################################################################
-# compute statistics
-################################################################################
+
+## compute statistics ----------------------------------------------------------
+
 Parms2Estimate <- c('CHL','CAR','EWT','LMA')
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
 for (parm in Parms2Estimate){
@@ -68,7 +69,7 @@ for (parm in Parms2Estimate){
   Stats_inversion_SS[[parm]]$Sampling <- as.numeric(rownames(Stats_inversion_SS[[parm]]))
 }
 
-# save Statistics
+## save Statistics -------------------------------------------------------------
 for (parm in names(Stats_inversion_SS)){
   FileName <- file.path(SpectralSampling_Dir,paste(parm,'_Statistics.csv',sep = ''))
   write_delim(x = Stats_inversion_SS[[parm]],
@@ -78,9 +79,9 @@ for (parm in names(Stats_inversion_SS)){
 }
 
 
-################################################################################
-# produce figure
-################################################################################
+
+## produce figure --------------------------------------------------------------
+
 
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
 
@@ -120,10 +121,14 @@ plot_nrmse1 <- ggarrange(plot0$CHL,plot0$CAR,plot0$EWT,plot0$LMA,
                          legend = "none",
                          common.legend = TRUE
 )
-plot_nrmse<- annotate_figure(plot_nrmse1, 
-                             bottom = text_grob("NRMSE et (1-R²) en fonction du pas", 
+plot_nrmse<- ggpubr::annotate_figure(plot_nrmse1, 
+                             bottom = text_grob("NRMSE en fonction du pas", 
                                                 color = "black", 
                                                 face = "bold", 
                                                 size = 14))
 
-ggsave(file.path(SpectralSampling_Dir,paste('NRMSE_ALL','_SpectralSampling.png',sep = '')), plot_nrmse,device = "png")
+## save figures ----------------------------------------------------------------
+ggsave(file.path(SpectralSampling_Dir,
+                 paste('NRMSE_ALL','_SpectralSampling.png',sep = '')), 
+       plot_nrmse,
+       device = "png")

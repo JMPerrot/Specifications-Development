@@ -7,9 +7,9 @@ rm(list=ls(all=TRUE));gc()
 # define working directory as the directory where the script is located
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
-################################################################################
-# Libraries required
-################################################################################
+
+# Libraries required -----------------------------------------------------------
+
 library(tidyverse)
 library(prospect)
 library(data.table)
@@ -17,18 +17,18 @@ library(doFuture)
 source('../Libraries/Lib_Plots.R')
 source('../Libraries/Lib_Analysis_Inversion.R')
 
-################################################################################
-# input output directories
-################################################################################
+
+# input output directories -----------------------------------------------------
+
 PathData <- '../../01_DATA'
 PathResults <- '../../03_RESULTS'
 SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
 dir.create(path = SpectralShifting_Dir,
            showWarnings = F,recursive = T)
 
-################################################################################
-# load leaf optics dataset
-################################################################################
+
+# load leaf optics dataset -----------------------------------------------------
+
 dbName <- 'ANGERS'
 PathLOPdb <- file.path(PathData,dbName,'LeafOptics.RData')
 load(PathLOPdb)
@@ -36,9 +36,9 @@ lambda <- Reflectance$V1
 Reflectance <- Reflectance[,-1]
 Transmittance <- Transmittance[,-1]
 
-################################################################################
-# Define parameters for inversion
-################################################################################
+
+# Define parameters for inversion ----------------------------------------------
+
 Parms2Estimate <- c('EWT_LMA','CHL_CAR')
 Parms2Estimate_ind <- list('EWT_LMA'=c('EWT','LMA'),'CHL_CAR'=c('CHL','CAR'))
 # define spectral sampling
@@ -63,9 +63,9 @@ InitValues <- list()
 InitValues$CHL_CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 InitValues$EWT_LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 
-################################################################################
-# Perform inversion
-################################################################################
+
+# Perform inversion ------------------------------------------------------------
+
 # for each parameter
 nbWorkers <- 3
 registerDoFuture()
@@ -117,7 +117,7 @@ for (parm in Parms2Estimate){
   for (subparm in Parms2Estimate_ind[[parm]]){
     Estimate_SpectralShifting[[subparm]] <- do.call(cbind,lapply(PROSPECT_EST,'[[',subparm))
     Estimate_SpectralShifting[[subparm]] <- data.frame(Estimate_SpectralShifting[[subparm]])
-    colnames(Estimate_SpectralShifting[[subparm]]) <- unlist(minlambda[[parm]])
+    colnames(Estimate_SpectralShifting[[subparm]]) <- c(0:unlist(minlambda[[parm]]))
   }
 }
 plan(sequential)
@@ -131,9 +131,9 @@ for (parm in names(Estimate_SpectralShifting)){
               col_names = T)
 }
 
-# ################################################################################
-# # Produce figures
-# ################################################################################
+
+## Produce figures ------------------------------------------------------------
+
 
 # plot results
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
@@ -148,9 +148,12 @@ for (parm in names(Estimate_SpectralShifting)){
   for (col0 in colnames(Estimate_SpectralShifting[[parm]])){
     print(c(parm,col0))
     valStep <- as.numeric(col0)
-    if (valStep<10){subChar <- paste('00',as.character(valStep),sep = '')}
-    else if (valStep<100){subChar <- paste('0',as.character(valStep),sep = '')}
-    else if (valStep<1000){subChar <- as.character(valStep)}
+    if (valStep<10)
+      {subChar <- paste('00',as.character(valStep),sep = '')}
+    else if (valStep<100)
+      {subChar <- paste('0',as.character(valStep),sep = '')}
+    else if (valStep<1000)
+      {subChar <- as.character(valStep)}
     fileName <- file.path(SpectralShifting_subDir,'FIGURES', paste(parm,'_',subChar,'.png',sep = ''))
     PlotObj <- scatter_inversion(target = Factor[[parm]]*Biochemistry[[parm]],
                                  estimate = Factor[[parm]]*Estimate_SpectralShifting[[parm]][[col0]],
