@@ -26,6 +26,42 @@ PathResults <- '../../03_RESULTS'
 SFS_Dir <- file.path(PathResults,'04_FeatureSelection')
 dir.create(path = SFS_Dir,showWarnings = F,recursive = T)
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
+SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
+Reference_Dir <- file.path(PathResults,'01_Reference')
+
+
+
+## load leaf optics dataset ----------------------------------------------------
+
+dbName <- 'ANGERS'
+PathLOPdb <- file.path(PathData,dbName,'LeafOptics.RData')
+load(PathLOPdb)
+
+
+## compute statistics ----------------------------------------------------------
+
+Parms2Estimate <- c('CHL','CAR','EWT','LMA')
+Stats_inversion_Ref <- Stats_inversion_SS <- list()
+for (parm in Parms2Estimate){
+  # load reference#1 for inversion
+  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#1.RData',sep = ''))
+  load(FileName)
+  Ref1 <- ResultsInversion
+  # load reference#2 for inversion
+  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#2.RData',sep = ''))
+  load(FileName)
+  Ref2 <- ResultsInversion
+  
+  # compute performances
+  # ref#1
+  Stats_inversion_Ref[[parm]] <- Stats_inversion_SS[[parm]] <- list()
+  Stats_inversion_Ref[[parm]][['REF1']] <- get_performances_inversion(target = Ref1$measured,
+                                                                      estimate = Ref1$estimated, 
+                                                                      categories= TRUE)
+  Stats_inversion_Ref[[parm]][['REF2']] <- get_performances_inversion(target = Ref2$measured,
+                                                                      estimate = Ref2$estimated, 
+                                                                      categories= TRUE)
+}
 
 ################################################################################
 # repository where data are stored
@@ -77,12 +113,20 @@ InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01
 # Perform SFS reduce spectral information
 ################################################################################
 # number of CPU available
-nbWorkers <- 8
+nbWorkers <- 16
 
 # define spectral domain
+Opt_Shifting <- list()
+for (parm in Parms2Estimate){
+  FileName <- file.path(SpectralShifting_Dir,paste(parm,'_Statistics.csv',sep = ''))
+  Stats[[parm]] <- readr::read_delim(file = FileName,delim = '\t')
+  Opt_Shifting[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]
+}
 SpectralDomain <- list()
-SpectralDomain$CHL <- SpectralDomain$CAR <- list('minWL' = 400, 'maxWL' = 900)
-SpectralDomain$EWT <- SpectralDomain$LMA <- list('minWL' = 1300, 'maxWL' = 2400)
+SpectralDomain$CHL <- list('minWL' = 400+Opt_Shifting$CHL, 'maxWL' = 900+Opt_Shifting$CHL)
+SpectralDomain$CAR <- list('minWL' = 400+Opt_Shifting$CAR, 'maxWL' = 900+Opt_Shifting$CAR)
+SpectralDomain$EWT <- list('minWL' = 1300+Opt_Shifting$EWT, 'maxWL' = 2400+Opt_Shifting$EWT)
+SpectralDomain$LMA <- list('minWL' = 1300+Opt_Shifting$LMA, 'maxWL' = 2400+Opt_Shifting$LMA)
 
 Evol_NRMSE <- DiscardedWL <- list()
 for (parm in Parms2Estimate){
@@ -168,138 +212,63 @@ for (parm in Parms2Estimate){
   Evol_NRMSE[[parm]] <- c(AllFeat,Evol_NRMSE[[parm]])
 }
 
-
+PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
+plotparm <- list()
 for (parm in Parms2Estimate){
   df <- data.frame('Discarded_WL' = DiscardedWL[[parm]],
                    'NRMSE' = Evol_NRMSE[[parm]])
+  
   filename <- file.path(SFS_Dir,paste(parm,'_FeatureSelection.csv',sep = ''))
   write_delim(x = df,
               file = filename,
               delim = '\t',
               col_names = T)
+
+  # load inversion results for spectral samplings
+
+  SpecSampling <- readr::read_delim(file = filename,delim = '\t')
+  
+  fileplot<-file.path(SFS_Dir,paste(parm,'_FeatureSelection.png',sep = ''))
+  
+  plotparm[[parm]]<-ggplot(SpecSampling, aes(x = c(1:length(Discarded_WL)), y = NRMSE))+
+    geom_line(aes(x = c(1:length(Discarded_WL)), y = NRMSE), colour = PlotCols[[parm]], size = 1)+
+    labs(x="number of wl deleted",y="NRMSE (%)") +
+    theme_bw() +
+    geom_abline(slope = 0, intercept = Stats_inversion_Ref[[parm]]$REF1$NRMSE, linetype='dashed',size=1,col='black') +
+    geom_abline(slope = 0, intercept = Stats_inversion_Ref[[parm]]$REF2$NRMSE,linetype='dashed',size=1,col='green')
+  
+  filename_plot<- file.path(SFS_Dir,paste(parm,'_FeatureSelection.png',sep = ''))
+  
+  ggsave(filename_plot,plot = plotparm[[parm]], device = "png", path = NULL,
+         scale = 1, width = 20, height = 13, units = "cm",
+         dpi = 600)
 }
-
-# for (parm in Parms2Estimate){
-#   filename <- file.path(SFS_Dir,paste(parm,'_FeatureSelection.csv',sep = ''))
-#   df <- read_delim(file = filename,
-#                    delim = '\t',
-#                    col_names = T)
-#   DiscardedWL[[parm]] <- df$Discarded_WL
-#   Evol_NRMSE[[parm]] <- df$NRMSE
-# }
-
-#
-#
-#
-#
-#
-#   nbVars <- length(listWL)
-#   NumVar_list <- as.list(seq(1,length(AllVars)))
-#   ResVar0 <- as.list(seq(1,length(AllVars)))
-#
-#
-#   subfeatures_SFS <- function() {
-#     foreach(numvar = NumVar_list) %dopar% {
-#       SelectedVarsTmp <- c(SelectedVars,AllVars[[numvar]])
-#       ResVar0 <- lapply(X = Spectralpop,FUN = spectral_variance_subset,
-#                         vars = SelectedVarsTmp, stand='None',
-#                         var_crown = F,var_residu = F)
-#
-#       ResVar0 <- as.data.frame(do.call(rbind,(lapply(ResVar0,unlist)))[,1:2])
-#       Corr_tot0 <- cor.test(ResVar0$var_tot,
-#                             All_Populations_diversite$Shannon)$estimate
-#       NRMSE_Est0 <- cor.test(ResVar0$var_sp,
-#                                 All_Populations_diversite$Shannon)$estimate
-#       return(list('ResVar0'=ResVar0,'NRMSE_Est0'=NRMSE_Est0,'Corr_tot0'=Corr_tot0))
-#     }
-#   }
-#   subSFS <- subfeatures_SFS()
-#
-#   ResVar[[nbvars2select]] <- lapply(subSFS,'[[',1)
-#   Corr_species[[nbvars2select]] <- matrix(unlist(lapply(subSFS,'[[',2)),ncol = 1)
-#   Corr_tot[[nbvars2select]]  <- matrix(unlist(lapply(subSFS,'[[',3)),ncol = 1)
-#   rownames(Corr_tot[[nbvars2select]]) <- rownames(Corr_species[[nbvars2select]]) <- AllVars
-#   # select component showing highest correlation between var_tot and Shannon from population
-#   SelVar <- which(Corr_tot[[nbvars2select]]==max(Corr_tot[[nbvars2select]],na.rm = T))
-#   WhichVar <- as.numeric(rownames(Corr_tot[[nbvars2select]])[SelVar])
-#   # add selected component to selected vars
-#   SelectedVars <- c(SelectedVars,WhichVar)
-#   # delete selected component from AllVars
-#   AllVars <- AllVars[-which(AllVars==WhichVar)]
-#   EvolCorr <- c(EvolCorr,max(Corr_tot[[nbvars2select]],na.rm = T))
-#
-#
-#
-#
-#
-#
-# }
-#
-#
-#
-#
-#
-#
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# parms_est_df=data.frame("CAR"=NA, "deleted_wl" = NA , "obs" = NA)              #           
-# 
-# seqWL<-c(500:540)#seq(400, 1000, by =10)
-# 
-# 
-# while(length(seqWL)>5){
-#   nrmse_df = data.frame("deleted_wl"=NA, "NRMSE" = NA)
-#   parms_est_df=data.frame("CAR"=NA, "deleted_wl" = NA , "obs" = NA) 
-#   for (i in c(1:length(seqWL))){
-#     seqWLR<-seqWL[-i] #sequence de longueure d'onde reduite
-#     lambda<-c(unlist(Reflectance[,1]))
-#     WLselect<-match(seqWLR,lambda)
-#     
-#     pb <- progress::progress_bar$new(
-#       format = "PROSPECT inversion [:bar] :percent in :elapsedfull",
-#       total = length(Reflectance), clear = FALSE, width= 100)
-#     
-#     for (j in c(2:length(Reflectance))) {
-#       DataFit<-FitSpectralData(SpecPROSPECT = SpecPROSPECT,
-#                                lambda = SpecPROSPECT$lambda,
-#                                Refl = matrix(unlist(Reflectance[[j]])),
-#                                Tran = matrix(unlist(Transmittance[[j]])),
-#                                UserDomain = seqWLR,
-#                                UL_Bounds = FALSE)
-#       
-#       Invert_est<-Invert_PROSPECT(SpecPROSPECT = DataFit$SpecPROSPECT,
-#                                   Refl = DataFit$Refl,
-#                                   Tran = DataFit$Tran,
-#                                   InitValues = data.frame(CHL = 40, CAR = 10, ANT = 0.1, BROWN = 0.01, EWT = 0.01, LMA
-#                                                           = 0.01, PROT = 0.001, CBC = 0.009, N = 1.5, alpha = 40),
-#                                   Parms2Estimate = c('CHL','CAR'))
-#       
-#       est = data.frame("CAR"=Invert_est$CAR, 
-#                        "deleted_wl" = seqWL[i],
-#                        "obs" = j)    
-#       
-#       parms_est_df=rbind(parms_est_df, est)
-#       pb$tick()
-#     }
-#     parms<- parms_est_df %>% filter(parms_est_df$deleted_wl == seqWL[i])
-#     nrmse_wl=get_performances_inversion(target = Biochemistry$CAR,
-#                                         estimate = parms$CAR,
-#                                         categories= TRUE)[3]
-#     nrmse_df=rbind(nrmse_df, data.frame("deleted_wl" = seqWL[i],"NRMSE" = nrmse_wl[[1]]))
-#   }
-#   
-#   nrmse_df<-nrmse_df[-1,]
-#   min_nrmse<-min(as.matrix(nrmse_df$NRMSE))
-#   nline<-match(1,match(nrmse_df$NRMSE,min_nrmse))
-#   seqWL<-seqWL[-nline]
-# }
-# 
-# nrmse_df<-nrmse_df[-1,]
+plot_parm1 <- ggarrange(plotparm$CHL,plotparm$CAR,plotparm$EWT,plotparm$LMA,
+                         plotlist = NULL,
+                         ncol = 2,
+                         nrow = 2,
+                         labels = NULL,
+                         label.x = 0,
+                         label.y = 1,
+                         hjust = -0.5,
+                         vjust = 1.5,
+                         font.label = list(size = 10, 
+                                           color = "black", 
+                                           face = "bold", 
+                                           family = NULL),
+                         align = "none",
+                         widths = 100,
+                         heights = 100,
+                         legend = "none",
+                         common.legend = TRUE
+)
+plot_parm<- ggpubr::annotate_figure(plot_parm1, 
+                                     bottom = text_grob("NRMSE en du nombre de longueur d'onde", 
+                                                        color = "black", 
+                                                        face = "bold", 
+                                                        size = 14))
+## save figures ----------------------------------------------------------------
+ggsave(file.path(SFS_Dir,
+                 paste('NRMSE_ALL_','SFS.png',sep = '')), 
+       plot_parm,
+       device = "png")

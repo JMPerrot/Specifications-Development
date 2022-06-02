@@ -23,8 +23,8 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 PathData <- '../../01_DATA'
 PathResults <- '../../03_RESULTS'
 SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
-dir.create(path = SpectralShifting_Dir,
-           showWarnings = F,recursive = T)
+SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
+dir.create(path = SpectralShifting_Dir, showWarnings = F,recursive = T)
 
 
 # load leaf optics dataset -----------------------------------------------------
@@ -39,12 +39,21 @@ Transmittance <- Transmittance[,-1]
 
 # Define parameters for inversion ----------------------------------------------
 
-Parms2Estimate <- c('EWT_LMA','CHL_CAR')
+Parms2Estimate <- c('EWT','LMA','CHL','CAR')
 Parms2Estimate_ind <- list('EWT_LMA'=c('EWT','LMA'),'CHL_CAR'=c('CHL','CAR'))
+
+Stats<-list()
+Opt_Sampling<-list()
+for (parm in Parms2Estimate){
+  FileName <- file.path(SpectralSampling_Dir,paste(parm,'_Statistics.csv',sep = ''))
+  Stats[[parm]] <- readr::read_delim(file = FileName,delim = '\t')
+  Opt_Sampling[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]
+}
 # define spectral sampling
 SpectralSampling <- list()
-SpectralSampling$CHL_CAR <- 40
-SpectralSampling$EWT_LMA <- 100
+SpectralSampling$CHL <- Opt_Sampling$CHL 
+SpectralSampling$CAR <- Opt_Sampling$CAR
+SpectralSampling$EWT_LMA <- 45
 
 # define spectral domain
 minlambda <- list()
@@ -67,7 +76,7 @@ InitValues$EWT_LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=
 # Perform inversion ------------------------------------------------------------
 
 # for each parameter
-nbWorkers <- 3
+nbWorkers <- 16
 registerDoFuture()
 plan(multisession, workers = nbWorkers)
 Estimate_SpectralShifting <- list()
@@ -81,8 +90,8 @@ for (parm in Parms2Estimate){
   Invert_SpectralShifting <- function() {
     foreach(subshifting = c(0:max(unlist(SpectralSampling)))) %dopar% {
       SpectralDomain <- list()
-      SpectralDomain$CHL_CAR <- list('minWL' = 400+subshifting, 'maxWL' = 900)
-      SpectralDomain$EWT_LMA <- list('minWL' = 1300+subshifting, 'maxWL' = 2400)
+      SpectralDomain$CHL_CAR <- list('minWL' = 400+subshifting, 'maxWL' = 900+subshifting)
+      SpectralDomain$EWT_LMA <- list('minWL' = 1300+subshifting, 'maxWL' = 2400+subshifting)
       if (subshifting<10){subChar <- paste('00',as.character(subshifting),sep = '')}
       else if (subshifting<100){subChar <- paste('0',as.character(subshifting),sep = '')}
       else if (subshifting<1000){subChar <- as.character(subshifting)}
@@ -117,7 +126,7 @@ for (parm in Parms2Estimate){
   for (subparm in Parms2Estimate_ind[[parm]]){
     Estimate_SpectralShifting[[subparm]] <- do.call(cbind,lapply(PROSPECT_EST,'[[',subparm))
     Estimate_SpectralShifting[[subparm]] <- data.frame(Estimate_SpectralShifting[[subparm]])
-    colnames(Estimate_SpectralShifting[[subparm]]) <- c(0:unlist(minlambda[[parm]]))
+    colnames(Estimate_SpectralShifting[[subparm]]) <- minlambda[[parm]]
   }
 }
 plan(sequential)
@@ -149,11 +158,11 @@ for (parm in names(Estimate_SpectralShifting)){
     print(c(parm,col0))
     valStep <- as.numeric(col0)
     if (valStep<10)
-      {subChar <- paste('00',as.character(valStep),sep = '')}
+    {subChar <- paste('00',as.character(valStep),sep = '')}
     else if (valStep<100)
-      {subChar <- paste('0',as.character(valStep),sep = '')}
+    {subChar <- paste('0',as.character(valStep),sep = '')}
     else if (valStep<1000)
-      {subChar <- as.character(valStep)}
+    {subChar <- as.character(valStep)}
     fileName <- file.path(SpectralShifting_subDir,'FIGURES', paste(parm,'_',subChar,'.png',sep = ''))
     PlotObj <- scatter_inversion(target = Factor[[parm]]*Biochemistry[[parm]],
                                  estimate = Factor[[parm]]*Estimate_SpectralShifting[[parm]][[col0]],

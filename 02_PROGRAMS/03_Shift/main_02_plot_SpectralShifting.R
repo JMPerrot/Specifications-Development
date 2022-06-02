@@ -1,6 +1,7 @@
 ################################################################################
 ## This code summarizes the evolution of the performances of PROSPECT inversion
 ################################################################################
+
 # Always start a script with a clean environment
 rm(list=ls(all=TRUE));gc()
 # define working directory as the directory where the script is located
@@ -13,6 +14,9 @@ library(tidyverse)
 library(prospect)
 library(data.table)
 library(doFuture)
+library(ggpmisc)
+library(ggplot2)
+library(ggpubr)
 source('../Libraries/Lib_Plots.R')
 source('../Libraries/Lib_Analysis_Inversion.R')
 
@@ -95,10 +99,10 @@ for (parm in Parms2Estimate){
     geom_abline(slope = 0, intercept = Stats_inversion_Ref[[parm]]$REF2$NRMSE,
                 linetype='dashed',size=1,col='green')
   plot0[[parm]]<- ggpubr::annotate_figure(plot0[[parm]],
-                                       bottom = text_grob(parm, 
-                                                          color = "black", 
-                                                          face = "bold", 
-                                                          size = 10))
+                                          bottom = text_grob(parm, 
+                                                             color = "black", 
+                                                             face = "bold", 
+                                                             size = 10))
   
   
   filename = file.path(SpectralShifting_Dir,paste('NRMSE_',parm,'_SpectralShifting.png',sep = ''))
@@ -136,3 +140,4 @@ ggsave(file.path(SpectralShifting_Dir,
                  paste('NRMSE_ALL','_SpectralShifting.png',sep = '')), 
        plot_nrmse,
        device = "png")
+
