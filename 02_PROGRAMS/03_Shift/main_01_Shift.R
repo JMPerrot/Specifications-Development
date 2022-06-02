@@ -53,8 +53,8 @@ for (parm in Parms2Estimate){
 SpectralSampling <- list()
 SpectralSampling$CHL <- Opt_Sampling$CHL 
 SpectralSampling$CAR <- Opt_Sampling$CAR
-SpectralSampling$EWT_LMA <- 45
-
+SpectralSampling$LMA <- 45
+SpectralSampling$EWT <- 45
 # define spectral domain
 minlambda <- list()
 minlambda$CHL_CAR <- c(0:max(unlist(SpectralSampling)))
@@ -64,13 +64,13 @@ minlambda$EWT_LMA <- c(0:max(unlist(SpectralSampling)))
 
 # define parameters to estimate during inversion
 ParmsEstInv <- list()
-ParmsEstInv$CHL_CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
-ParmsEstInv$EWT_LMA <- c('EWT', 'LMA', 'N')
+ParmsEstInv$CHL<-ParmsEstInv$CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
+ParmsEstInv$EWT<-ParmsEstInv$LMA <- c('EWT', 'LMA', 'N')
 
 # define parameters to estimate during inversion
 InitValues <- list()
-InitValues$CHL_CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-InitValues$EWT_LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
+InitValues$CHL<-InitValues$CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
+InitValues$EWT<-InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 
 
 # Perform inversion ------------------------------------------------------------
@@ -90,11 +90,15 @@ for (parm in Parms2Estimate){
   Invert_SpectralShifting <- function() {
     foreach(subshifting = c(0:max(unlist(SpectralSampling)))) %dopar% {
       SpectralDomain <- list()
-      SpectralDomain$CHL_CAR <- list('minWL' = 400+subshifting, 'maxWL' = 900+subshifting)
-      SpectralDomain$EWT_LMA <- list('minWL' = 1300+subshifting, 'maxWL' = 2400+subshifting)
-      if (subshifting<10){subChar <- paste('00',as.character(subshifting),sep = '')}
-      else if (subshifting<100){subChar <- paste('0',as.character(subshifting),sep = '')}
-      else if (subshifting<1000){subChar <- as.character(subshifting)}
+      SpectralDomain$CHL<-SpectralDomain$CAR <- list('minWL' = 400+subshifting, 'maxWL' = 900+subshifting)
+      SpectralDomain$EWT<-SpectralDomain$LMA <- list('minWL' = 1300+subshifting, 'maxWL' = 2400+subshifting)
+      if (subshifting<10){
+        subChar <- paste('00',as.character(subshifting),sep = '')
+      }else if (subshifting<100){
+        subChar <- paste('0',as.character(subshifting),sep = '')
+      }else if (subshifting<1000){
+          subChar <- as.character(subshifting)
+          }
       FileName <- file.path(SpectralShifting_subDir,
                             paste(parm,'_SpecShifting_',subChar,'.RData',sep = ''))
       if (!file.exists(FileName)){
