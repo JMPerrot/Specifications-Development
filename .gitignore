@@ -41,3 +41,6 @@ vignettes/*.pdf
 
 # output directory
 /03_RESULTS/
+
+# input directory
+/02_DATA/
