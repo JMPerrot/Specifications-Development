@@ -20,8 +20,8 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 
 # input output directories -----------------------------------------------------
 
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/R_only'
 SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 dir.create(path = SpectralShifting_Dir, showWarnings = F,recursive = T)
@@ -43,7 +43,7 @@ Transmittance <- Transmittance[,-1]
 
 # Define parameters for inversion ----------------------------------------------
 
-Parms2Estimate <- c('EWT','LMA','CHL','CAR')#
+Parms2Estimate <- c('EWT')#,'LMA','CHL','CAR'
 Parms2Estimate_ind <- list('CHL'=c('CHL'),'EWT'= 'EWT','LMA'=c('LMA'),'CAR'=c('CAR'))#
 
 Stats<-list()
@@ -55,7 +55,7 @@ for (parm in Parms2Estimate){
 }
 # define spectral sampling
 SpectralSampling <- list()
-SpectralSampling$CHL <- Opt_Sampling$CHL 
+SpectralSampling$CHL <- Opt_Sampling$CHL
 SpectralSampling$CAR <- Opt_Sampling$CAR
 SpectralSampling$LMA <- Opt_Sampling$LMA
 SpectralSampling$EWT <- Opt_Sampling$EWT
@@ -93,7 +93,7 @@ for (parm in Parms2Estimate){
   print(parm)
   # apply multiprocessing for each spectral sampling
   Invert_SpectralShifting <- function() {
-    foreach(subshifting = c(0:max(unlist(SpectralSampling)))) %dopar% {
+    foreach(subshifting = c(0:max(unlist(SpectralSampling[[parm]])))) %dopar% {
       SpectralDomain <- list()
       SpectralDomain$CHL<-SpectralDomain$CAR <- list('minWL' = 400 +subshifting, 'maxWL' = 900)  #+subshifting)
       SpectralDomain$EWT<-SpectralDomain$LMA <- list('minWL' = 1300+subshifting, 'maxWL' = 2400)#+subshifting)

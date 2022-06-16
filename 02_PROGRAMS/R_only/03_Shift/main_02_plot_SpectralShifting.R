@@ -23,8 +23,8 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 
 ## input output directories ----------------------------------------------------
 
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/R_only'
 Reference_Dir <- file.path(PathResults,'01_Reference')
 SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
 
@@ -41,6 +41,7 @@ load(PathLOPdb)
 Parms2Estimate <- c('CHL','CAR','EWT','LMA')#
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
 for (parm in Parms2Estimate){
+  
   # load reference#1 for inversion
   FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#1.RData',sep = ''))
   load(FileName)
@@ -52,7 +53,7 @@ for (parm in Parms2Estimate){
   # load inversion results for spectral samplings
   FileName <- file.path(SpectralShifting_Dir,paste(parm,'_SpecShifting.csv',sep = ''))
   SpecShifting <- readr::read_delim(file = FileName,delim = '\t')
-  
+
   # compute performances
   # ref#1
   Stats_inversion_Ref[[parm]] <- Stats_inversion_SS[[parm]] <- list()
@@ -63,9 +64,17 @@ for (parm in Parms2Estimate){
                                                                       estimate = Ref2$estimated, 
                                                                       categories= TRUE)
   for (ss in colnames(SpecShifting)){
+    if (parm == "EWT"){
+      
+      # SpecShifting[c(23)] = 0
+      Stats_inversion_SS[[parm]][[ss]] <- get_performances_inversion(target = Biochemistry[[parm]],
+                                                                     estimate = SpecShifting[[ss]],
+                                                                     categories= TRUE)
+    }else{
     Stats_inversion_SS[[parm]][[ss]] <- get_performances_inversion(target = Biochemistry[[parm]],
                                                                    estimate = SpecShifting[[ss]],
                                                                    categories= TRUE)
+    }
   }
   Stats_inversion_SS[[parm]] <- do.call(rbind,Stats_inversion_SS[[parm]])
   Stats_inversion_SS[[parm]]$Sampling <- as.numeric(rownames(Stats_inversion_SS[[parm]]))

@@ -20,8 +20,8 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/R_only'
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 dir.create(path = SpectralSampling_Dir,
            showWarnings = F,recursive = T)
@@ -39,8 +39,8 @@ Reflectance <- Reflectance[,-1]
 ################################################################################
 # Define parameters for inversion
 ################################################################################
-Parms2Estimate <- c('EWT_LMA','CHL_CAR')
-Parms2Estimate_ind <- list('EWT_LMA'=c('EWT','LMA'),'CHL_CAR'=c('CHL','CAR'))
+Parms2Estimate <- c('EWT_LMA')#,'CHL_CAR'
+Parms2Estimate_ind <- list('EWT_LMA'=c('EWT','LMA'))#,'CHL_CAR'=c('CHL','CAR')
 # define spectral sampling
 SpectralSampling <- list()
 SpectralSampling$CHL_CAR <- as.list(c(seq(2,50,by=1),seq(60,100,by=10)))

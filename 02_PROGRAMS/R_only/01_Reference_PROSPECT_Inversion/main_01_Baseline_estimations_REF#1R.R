@@ -24,8 +24,8 @@ source('../Libraries/Lib_Plots.R')
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS/01_Reference'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/01_Reference/R_only'
 dir.create(PathResults,showWarnings = F,recursive = T)
 ################################################################################
 # repository where data are stored
@@ -56,7 +56,7 @@ SubTran <- SubData$Tran
 print('PROSPECT inversion using full spectral range')
 res <- Invert_PROSPECT(SpecPROSPECT = SubSpecPROSPECT, 
                        Refl = SubRefl, 
-                       Tran = NULL, 
+                       Tran = SubTran, 
                        PROSPECT_version = 'D', 
                        Parms2Estimate = Parms2Estimate, 
                        InitValues = InitValues)

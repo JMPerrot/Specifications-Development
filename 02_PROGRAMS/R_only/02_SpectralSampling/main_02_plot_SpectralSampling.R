@@ -22,8 +22,8 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 
 ## Input output directories ----------------------------------------------------
 
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/R_only'
 Reference_Dir <- file.path(PathResults,'01_Reference')
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 

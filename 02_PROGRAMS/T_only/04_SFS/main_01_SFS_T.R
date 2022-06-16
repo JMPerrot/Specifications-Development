@@ -21,8 +21,8 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/T_only'
 SFS_Dir <- file.path(PathResults,'04_FeatureSelection')
 dir.create(path = SFS_Dir,showWarnings = F,recursive = T)
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
@@ -40,7 +40,7 @@ load(PathLOPdb)
 
 ## compute statistics ----------------------------------------------------------
 
-Parms2Estimate <- c('CHL','CAR','EWT','LMA')
+Parms2Estimate <- c('EWT','LMA')#'CHL','CAR',
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
 for (parm in Parms2Estimate){
   # load reference#1 for inversion
@@ -78,7 +78,6 @@ Transmittance <- Transmittance[,-1]
 ################################################################################
 # CHL & CAR: get spectral sampling corresponding to min NRMSE value 
 # EWT & LMA: get trade-off = 45
-Parms2Estimate <- c('CHL','CAR','EWT','LMA')
 # Parms2Estimate <- c('LMA')
 Opt_Sampling <- list()
 Stats <- list()
@@ -88,7 +87,7 @@ for (parm in Parms2Estimate){
   if (parm =='CHL' | parm =='CAR'){
     Opt_Sampling[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]
   } else if (parm =='EWT' | parm =='LMA'){
-    Opt_Sampling[[parm]] <- 45
+    Opt_Sampling[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]
   }
 }
 
@@ -97,15 +96,15 @@ for (parm in Parms2Estimate){
 ################################################################################
 # define parameters to estimate during inversion
 ParmsEstInv <- list()
-ParmsEstInv$CHL <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
-ParmsEstInv$CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
+# ParmsEstInv$CHL <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
+# ParmsEstInv$CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
 ParmsEstInv$EWT <- c('EWT', 'LMA', 'N')
 ParmsEstInv$LMA <- c('EWT', 'LMA', 'N')
 
 # define parameters to estimate during inversion
 InitValues <- list()
-InitValues$CHL <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-InitValues$CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
+# InitValues$CHL <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
+# InitValues$CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 InitValues$EWT <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 
@@ -113,7 +112,7 @@ InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01
 # Perform SFS reduce spectral information
 ################################################################################
 # number of CPU available
-nbWorkers <- 16
+nbWorkers <- 3
 
 # define spectral domain
 Opt_Shifting <- list()
@@ -123,8 +122,8 @@ for (parm in Parms2Estimate){
   Opt_Shifting[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]
 }
 SpectralDomain <- list()
-SpectralDomain$CHL <- list('minWL' = 400+Opt_Shifting$CHL, 'maxWL' = 900)
-SpectralDomain$CAR <- list('minWL' = 400+Opt_Shifting$CAR, 'maxWL' = 900)
+# SpectralDomain$CHL <- list('minWL' = 400+Opt_Shifting$CHL, 'maxWL' = 900)
+# SpectralDomain$CAR <- list('minWL' = 400+Opt_Shifting$CAR, 'maxWL' = 900)
 SpectralDomain$EWT <- list('minWL' = 1300+Opt_Shifting$EWT, 'maxWL' = 2400)
 SpectralDomain$LMA <- list('minWL' = 1300+Opt_Shifting$LMA, 'maxWL' = 2400)
 
@@ -212,7 +211,7 @@ for (parm in Parms2Estimate){
   Evol_NRMSE[[parm]] <- c(AllFeat,Evol_NRMSE[[parm]])
 }
 
-PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
+PlotCols <- list( 'LMA' = "red", 'EWT' = "blue")#'CHL' = "#66CC00", 'CAR' = "orange",
 plotparm <- list()
 for (parm in Parms2Estimate){
   df <- data.frame('Discarded_WL' = DiscardedWL[[parm]],
