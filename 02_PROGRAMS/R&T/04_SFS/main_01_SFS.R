@@ -42,7 +42,7 @@ load(PathLOPdb)
 
 ## compute statistics ----------------------------------------------------------
 
-Parms2Estimate <- c('CHL','CAR','EWT','LMA')
+Parms2Estimate <- c('CHL','CAR','EWT','LMA')#
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
 for (parm in Parms2Estimate){
   # load reference#1 for inversion
@@ -77,8 +77,7 @@ Transmittance <- Transmittance[,-1]
 ################################################################################
 # CHL & CAR: get spectral sampling corresponding to min NRMSE value 
 # EWT & LMA: get trade-off = 45
-Parms2Estimate <- c('CHL','CAR','EWT','LMA')
-# Parms2Estimate <- c('LMA')
+
 Opt_Sampling <- list()
 Stats <- list()
 for (parm in Parms2Estimate){
@@ -112,7 +111,7 @@ InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01
 # Perform SFS reduce spectral information
 ################################################################################
 # number of CPU available
-nbWorkers <- 16
+nbWorkers <- 2
 
 # define spectral domain
 Opt_Shifting <- list()
@@ -228,15 +227,15 @@ for (parm in Parms2Estimate){
                 file = filename,
                 delim = '\t',
                 col_names = T)
-  }else{
-    SpecSampling <- readr::read_delim(file = filename,delim = '\t')
   }
+  SpecSampling <- readr::read_delim(file = filename,delim = '\t')
+  
   # load inversion results for spectral samplings
   
   fileplot<-file.path(SFS_Dir,paste(parm,'_FeatureSelection.png',sep = ''))
   
   plotparm[[parm]]<-ggplot(SpecSampling, aes(x = seq(length(Discarded_WL),1, -1), y = NRMSE))+
-    geom_line(aes(x = c(1:length(Discarded_WL)), y = NRMSE), colour = PlotCols[[parm]], size = 1)+
+    geom_line(aes(x = seq(length(Discarded_WL),1, -1), y = NRMSE), colour = PlotCols[[parm]], size = 1)+
     labs(x="number of wl selected",y="NRMSE (%)") +
     ylim(0,100)+
     theme_bw() +
@@ -251,8 +250,8 @@ for (parm in Parms2Estimate){
 }
 plot_parm1 <- ggarrange(plotparm$CHL,plotparm$CAR,plotparm$EWT,plotparm$LMA,
                         plotlist = NULL,
-                        ncol = 2,
-                        nrow = 2,
+                        ncol = 4,
+                        nrow = 1,
                         labels = NULL,
                         label.x = 1,
                         label.y = 1,
