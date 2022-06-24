@@ -99,7 +99,7 @@ scatter_inversion <- function(target, estimate, Colors, Labs, fileName,
   }
   # get iamge format
   ext_figure <- tools::file_ext(fileName)
-  ggsave(filename = fileName, plot = Splot, device = ext_figure, path = NULL,
+  ggsave(filename = fileName, plot = Splot, device = png, path = NULL,
          scale = 1, width = width, height = height, units = "in", dpi = 600)
   return(invisible(Splot))
 }
