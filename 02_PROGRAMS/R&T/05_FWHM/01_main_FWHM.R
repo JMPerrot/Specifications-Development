@@ -29,7 +29,7 @@ source('../Libraries/Lib_Plots.R')
 ################################################################################
 PathData <- '../../../01_DATA'
 PathResults <- '../../../03_RESULTS/R&T'
-PathSRF <- file.path(PathResults,'06_SRF')
+PathSRF <- file.path(PathResults,'05_SRF')
 dir.create(path = PathSRF,showWarnings = F,recursive = T)
 
 ################################################################################
@@ -55,7 +55,7 @@ List_FWHM <- list(1,2,3,4,5,10,15,20,25)
 DirSave_Root <- file.path(PathSRF,'SRF_fwhm_')
 wavelenght_tested <- list()
 wavelenght_tested$CHL <- c(714,849)
-wavelenght_tested$CAR <- c(557,518)
+wavelenght_tested$CAR <- c(518, 557)
 wavelenght_tested$EWT <- c(1792,2332,2017,1882)
 wavelenght_tested$LMA <- c(1882,1747,1477,2287)
 List_FWHM_to_do <- list()
@@ -135,7 +135,7 @@ for (parm in Parms2Estimate){
 ################################################################################
 # results data paths
 ################################################################################
-pathdata1 <- "../../../03_RESULTS/R&T/06_SRF/SRF_fwhm_"
+pathdata1 <- "../../../03_RESULTS/R&T/05_SRF/SRF_fwhm_"
 pathdata3 <- "nm/"
 
 plot<-list()
@@ -175,7 +175,7 @@ for(parm in parm2estimate){
                           parse = TRUE)+
     ylim(0,90)
   
-  filename = file.path('../../../03_RESULTS/R&T/06_SRF/', paste(parm, '_NRMSE_FWHM_standard.png', sep = ""))
+  filename = file.path('../../../03_RESULTS/R&T/05_SRF/', paste(parm, '_NRMSE_FWHM_standard.png', sep = ""))
   ggsave(filename,plot = plot[[parm]], device = "png", path = NULL,
          scale = 1, width = 20, height = 13, units = "cm",
          dpi = 600)
@@ -207,7 +207,7 @@ plot_nrmse<- ggpubr::annotate_figure(plot_nrmse1,
                                                         face = "bold", 
                                                         size = 14))
 ## save figures ----------------------------------------------------------------
-ggsave(file.path('../../../03_RESULTS/R&T/06_SRF/All_NRMSE_FWHM_standard.png'), 
+ggsave(file.path('../../../03_RESULTS/R&T/05_SRF/All_NRMSE_FWHM_standard.png'), 
        plot_nrmse,
        device = "png")
 
