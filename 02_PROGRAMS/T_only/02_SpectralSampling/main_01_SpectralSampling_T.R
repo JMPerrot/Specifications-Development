@@ -20,8 +20,8 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/T_only'
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 dir.create(path = SpectralSampling_Dir,
            showWarnings = F,recursive = T)

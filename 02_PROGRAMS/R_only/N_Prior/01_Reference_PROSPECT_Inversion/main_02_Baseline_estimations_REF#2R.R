@@ -18,14 +18,14 @@ library(ggplot2)
 library(ggpubr)
 library(grid)
 library(gridExtra)
-source('../Libraries/Lib_Analysis_Inversion.R')
-source('../Libraries/Lib_Plots.R')
+source('../../../Libraries/Lib_Analysis_Inversion.R')
+source('../../../Libraries/Lib_Plots.R')
 
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../../01_DATA'
-PathResults <- '../../../03_RESULTS/T_only/01_Reference'
+PathData <- '../../../../01_DATA'
+PathResults <- '../../../../03_RESULTS/R_only/N_Prior/01_Reference'
 dir.create(PathResults,showWarnings = F,recursive = T)
 ################################################################################
 # repository where data are stored
@@ -50,8 +50,7 @@ ParmEst <- Invert_PROSPECT_OPT(SpecPROSPECT = SpecPROSPECT,
                                Refl = Refl, 
                                Tran = Tran, 
                                PROSPECT_version = 'D',
-                               Parms2Estimate = Parms2Estimate, 
-                               InitValues = InitValues)
+                               Parms2Estimate = Parms2Estimate, InitValues = InitValues)
 
 
 # compute statistics for inversion
@@ -73,7 +72,7 @@ for (parm in ParmsOfInterest){
 
 # save results
 for (parm in ParmsOfInterest){
-  FileName <- file.path(PathResults,paste(parm,'_REFERENCE#2T.RData',sep = ''))
+  FileName <- file.path(PathResults,paste(parm,'_REFERENCE#2R.RData',sep = ''))
   ResultsInversion <- Inversion_Ref2[[parm]]
   save(ResultsInversion ,file = FileName)
 }
@@ -85,7 +84,7 @@ PlotObj <- list()
 for (parm in ParmsOfInterest){
   Labs <- c(paste('Measured',parm,UnitsParms[[parm]]), 
             paste('Estimated',parm,UnitsParms[[parm]]))
-  fileName <- file.path(PathResults,'FIGURES', paste(parm,'_REFERENCE#2T.png',sep = ''))
+  fileName <- file.path(PathResults,'FIGURES', paste(parm,'_REFERENCE#2R.png',sep = ''))
   PlotObj[[parm]] <- scatter_inversion(target = Inversion_Ref2[[parm]]$measured,
                                        estimate = Inversion_Ref2[[parm]]$estimated,
                                        Colors = PlotCols[[parm]],
@@ -97,5 +96,5 @@ for (parm in ParmsOfInterest){
                                        size = 1)
 }
 gg <- grid.arrange(grobs = PlotObj, ncol = 2)
-fileName <- file.path(PathResults,'FIGURES', 'All_REFERENCE#2T.png')
+fileName <- file.path(PathResults,'FIGURES', 'All_REFERENCE#2R.png')
 ggsave(fileName, gg,device = "png")

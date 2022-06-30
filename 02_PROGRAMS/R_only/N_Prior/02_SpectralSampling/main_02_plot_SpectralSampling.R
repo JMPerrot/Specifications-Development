@@ -23,7 +23,7 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 ## Input output directories ----------------------------------------------------
 
 PathData <- '../../../01_DATA'
-PathResults <- '../../../03_RESULTS/T_only'
+PathResults <- '../../../03_RESULTS/R_only'
 Reference_Dir <- file.path(PathResults,'01_Reference')
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 
@@ -41,11 +41,11 @@ Parms2Estimate <- c('CHL','CAR','EWT','LMA')
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
 for (parm in Parms2Estimate){
   # load reference#1 for inversion
-  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#1T.RData',sep = ''))
+  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#1.RData',sep = ''))
   load(FileName)
   Ref1 <- ResultsInversion
   # load reference#2 for inversion
-  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#2T.RData',sep = ''))
+  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#2.RData',sep = ''))
   load(FileName)
   Ref2 <- ResultsInversion
   # load inversion results for spectral samplings

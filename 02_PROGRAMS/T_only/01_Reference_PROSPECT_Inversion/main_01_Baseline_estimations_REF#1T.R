@@ -24,8 +24,8 @@ source('../Libraries/Lib_Plots.R')
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS/01_Reference'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/T_only/01_Reference'
 dir.create(PathResults,showWarnings = F,recursive = T)
 ################################################################################
 # repository where data are stored
@@ -55,7 +55,7 @@ SubTran <- SubData$Tran
 
 print('PROSPECT inversion using full spectral range')
 res <- Invert_PROSPECT(SpecPROSPECT = SubSpecPROSPECT, 
-                       Refl = NULL, 
+                       Refl = SubRefl, 
                        Tran = SubTran, 
                        PROSPECT_version = 'D', 
                        Parms2Estimate = Parms2Estimate, 
@@ -63,7 +63,7 @@ res <- Invert_PROSPECT(SpecPROSPECT = SubSpecPROSPECT,
 
 # compute statistics for inversion
 ParmsOfInterest <- c('CHL', 'CAR', 'EWT', 'LMA')
-UnitsParms <- list('CHL'='(µg/cm²)', 'CAR'='(µg/cm²)', 'EWT'='(mg/cm²)', 'LMA'='(mg/cm²)')
+UnitsParms <- list('CHL'='(?g/cm?)', 'CAR'='(?g/cm?)', 'EWT'='(mg/cm?)', 'LMA'='(mg/cm?)')
 Factor <- list('CHL'=1, 'CAR'=1, 'EWT'=1000, 'LMA'=1000)
 Inversion_Ref1 <- R2_Refl1 <- NRMSE_Refl1 <- list()
 for (parm in ParmsOfInterest){
