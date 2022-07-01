@@ -21,7 +21,7 @@ source('../../Libraries/Lib_Analysis_Inversion.R')
 # input output directories
 ################################################################################
 PathData <- '../../../01_DATA'
-PathResults <- '../../../03_RESULTS'
+PathResults <- '../../../03_RESULTS/R&T'
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 dir.create(path = SpectralSampling_Dir,
            showWarnings = F,recursive = T)
@@ -39,27 +39,27 @@ Transmittance <- Transmittance[,-1]
 ################################################################################
 # Define parameters for inversion
 ################################################################################
-Parms2Estimate <- c('EWT_LMA','CHL_CAR')
-Parms2Estimate_ind <- list('EWT_LMA'=c('EWT','LMA'),'CHL_CAR'=c('CHL','CAR'))
+Parms2Estimate <- c("CAR")#c('EWT','LMA','CHL','CAR')
+Parms2Estimate_ind <- list('EWT','LMA','CHL','CAR')
 # define spectral sampling
 SpectralSampling <- list()
-SpectralSampling$CHL_CAR <- as.list(c(seq(2,50,by=1),seq(60,100,by=10)))
-SpectralSampling$EWT_LMA <- as.list(c(seq(2,50,by=1),seq(60,100,by=10),seq(120,400,by=20)))
+SpectralSampling$CHL<-SpectralSampling$CAR <- as.list(c(seq(2,50,by=1),seq(60,100,by=10)))
+SpectralSampling$EWT<-SpectralSampling$LMA <- as.list(c(seq(2,50,by=1),seq(60,100,by=10),seq(120,400,by=20)))
 
 # define spectral domain
 SpectralDomain <- list()
-SpectralDomain$CHL_CAR <- list('minWL' = 400, 'maxWL' = 900)
-SpectralDomain$EWT_LMA <- list('minWL' = 1300, 'maxWL' = 2400)
+SpectralDomain$CHL<-SpectralDomain$CAR <- list('minWL' = 400, 'maxWL' = 900)
+SpectralDomain$EWT<-SpectralDomain$LMA <- list('minWL' = 1300, 'maxWL' = 2400)
 
 # define parameters to estimate during inversion
 ParmsEstInv <- list()
-ParmsEstInv$CHL_CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
-ParmsEstInv$EWT_LMA <- c('EWT', 'LMA', 'N')
+ParmsEstInv$CHL<-ParmsEstInv$CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
+ParmsEstInv$EWT<-ParmsEstInv$LMA <- c('EWT', 'LMA', 'N')
 
 # define parameters to estimate during inversion
 InitValues <- list()
-InitValues$CHL_CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-InitValues$EWT_LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
+InitValues$CHL<-InitValues$CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.011, LMA=0.01, N=1.5)
+InitValues$EWT<-InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.011, LMA=0.01, N=1.5)
 
 ################################################################################
 # Perform inversion

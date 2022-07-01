@@ -16,8 +16,8 @@ library(tidyverse)
 library(prospect)
 library(data.table)
 library(ggpubr)
-source('../Libraries/Lib_Plots.R')
-source('../Libraries/Lib_Analysis_Inversion.R')
+source('../../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
 
 ################################################################################
 # input output directories
@@ -89,9 +89,9 @@ for (parm in Parms2Estimate){
   if (parm =='CHL' | parm =='CAR'){
     Opt_Sampling[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]
   } else if (parm =='LMA'){
-    Opt_Sampling[[parm]] <- 69
+    Opt_Sampling[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]/4
   }else if (parm =='EWT'){
-    Opt_Sampling[[parm]] <- 63
+    Opt_Sampling[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]/4
   }
 }
 
@@ -116,7 +116,7 @@ InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01
 # Perform SFS reduce spectral information
 ################################################################################
 # number of CPU available
-nbWorkers <- 16
+nbWorkers <- 2
 
 # define spectral domain
 Opt_Shifting <- list()
@@ -135,6 +135,7 @@ Evol_NRMSE <- DiscardedWL <- list()
 
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
 plotparm <- list()
+
 
 for (parm in Parms2Estimate){
   filename <- file.path(SFS_Dir,paste(parm,'_FeatureSelection.csv',sep = ''))
@@ -175,13 +176,13 @@ for (parm in Parms2Estimate){
           DataFit <- FitSpectralData(SpecPROSPECT = SpecPROSPECT,
                                      lambda = lambda,
                                      Refl = Reflectance,
-                                     Tran = NULL,
+                                     Tran = Transmittance,
                                      UserDomain = SelectedWLTmp,
                                      UL_Bounds = FALSE)
           # perform PROSPECT inversion
           Invert_est <- prospect::Invert_PROSPECT(SpecPROSPECT = DataFit$SpecPROSPECT,
                                                   Refl = DataFit$Refl,
-                                                  Tran = DataFit$Tran,
+                                                  Tran = NULL,
                                                   PROSPECT_version = 'D',
                                                   Parms2Estimate = ParmsEstInv[[parm]],
                                                   InitValues = InitValues[[parm]],progressBar = FALSE)
@@ -224,23 +225,25 @@ for (parm in Parms2Estimate){
     
     
     
-    df <- data.frame('Discarded_WL' = DiscardedWL[[parm]],
+    SpecSampling <- data.frame('Discarded_WL' = DiscardedWL[[parm]],
                      'NRMSE' = Evol_NRMSE[[parm]])
     
     
-    write_delim(x = df,
+    write_delim(x = SpecSampling,
                 file = filename,
                 delim = '\t',
                 col_names = T)
   }else{
     SpecSampling <- readr::read_delim(file = filename,delim = '\t')
   }
+  # load inversion results for spectral samplings
   
   fileplot<-file.path(SFS_Dir,paste(parm,'_FeatureSelection.png',sep = ''))
   
-  plotparm[[parm]]<-ggplot(SpecSampling, aes(x = c(1:length(Discarded_WL)), y = NRMSE))+
-    geom_line(aes(x = c(1:length(Discarded_WL)), y = NRMSE), colour = PlotCols[[parm]], size = 1)+
-    labs(x="number of wl deleted",y="NRMSE (%)") +
+  plotparm[[parm]]<-ggplot(SpecSampling, aes(x = seq(length(Discarded_WL),1, -1), y = NRMSE))+
+    geom_line(aes(x = seq(length(Discarded_WL),1, -1), y = NRMSE), colour = PlotCols[[parm]], size = 1)+
+    labs(x="number of wl selected",y="NRMSE (%)") +
+    ylim(0,100)+
     theme_bw() +
     geom_abline(slope = 0, intercept = Stats_inversion_Ref[[parm]]$REF1$NRMSE, linetype='dashed',size=1,col='black') +
     geom_abline(slope = 0, intercept = Stats_inversion_Ref[[parm]]$REF2$NRMSE,linetype='dashed',size=1,col='green')
@@ -280,3 +283,4 @@ ggsave(file.path(SFS_Dir,
                  paste('NRMSE_ALL_','SFS.png',sep = '')), 
        plot_parm,
        device = "png")
+

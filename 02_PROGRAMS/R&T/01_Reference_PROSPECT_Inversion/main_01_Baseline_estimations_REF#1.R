@@ -18,14 +18,14 @@ library(ggplot2)
 library(ggpubr)
 library(grid)
 library(gridExtra)
-source('../Libraries/Lib_Analysis_Inversion.R')
-source('../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
+source('../../Libraries/Lib_Plots.R')
 
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS/01_Reference'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/01_Reference'
 dir.create(PathResults,showWarnings = F,recursive = T)
 ################################################################################
 # repository where data are stored
@@ -44,42 +44,57 @@ nbSamples <- ncol(Refl)
 Parms2Estimate  = 'ALL'
 InitValues <- data.frame(CHL=40, CAR=10, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 # Adjust spectral domain for SpecPROSPECT to fit leaf optical properties 
-SubData <- FitSpectralData(SpecPROSPECT=SpecPROSPECT,
-                           lambda = lambda, Refl = Refl, Tran =Tran,
-                           UserDomain = c(lambda[1],tail(lambda,n = 1)),
-                           UL_Bounds = TRUE)
-SubSpecPROSPECT <- SubData$SpecPROSPECT
-Sublambda <- SubData$lambda
-SubRefl <- SubData$Refl
-SubTran <- SubData$Tran
-
-print('PROSPECT inversion using full spectral range')
-res <- Invert_PROSPECT(SpecPROSPECT = SubSpecPROSPECT, 
-                       Refl = SubRefl, Tran = SubTran, 
-                       PROSPECT_version = 'D', Parms2Estimate = Parms2Estimate, 
-                       InitValues = InitValues)
-
-# compute statistics for inversion
-ParmsOfInterest <- c('CHL', 'CAR', 'EWT', 'LMA')
-UnitsParms <- list('CHL'='(Âµg/cmÂ²)', 'CAR'='(Âµg/cmÂ²)', 'EWT'='(mg/cmÂ²)', 'LMA'='(mg/cmÂ²)')
-Factor <- list('CHL'=1, 'CAR'=1, 'EWT'=1000, 'LMA'=1000)
+SubData<-list()
+SubSpecPROSPECT<-list()
+Sublambda<-list()
+SubRefl<-list()
+SubTran<-statsInv<- res<- list()
 Inversion_Ref1 <- R2_Refl1 <- NRMSE_Refl1 <- list()
-for (parm in ParmsOfInterest){
-  Inversion_Ref1[[parm]] <- data.frame('measured' = Factor[[parm]]*Biochemistry[[parm]],
-                                       'estimated' = Factor[[parm]]*res[[parm]])
+SubData$CHL<-SubData$CAR <- FitSpectralData(SpecPROSPECT=SpecPROSPECT,
+                           lambda = lambda, Refl = Refl, Tran =Tran,
+                           UserDomain = c(400,900),
+                           UL_Bounds = TRUE)
+SubData$LMA<-SubData$EWT <- FitSpectralData(SpecPROSPECT=SpecPROSPECT,
+                                   lambda = lambda, Refl = Refl, Tran =Tran,
+                                   UserDomain = c(1300,2400),
+                                   UL_Bounds = TRUE)
+for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")) {
+  SubSpecPROSPECT[[parm]] <- SubData[[parm]]$SpecPROSPECT
+  Sublambda[[parm]] <- SubData[[parm]]$lambda
+  SubRefl[[parm]] <- SubData[[parm]]$Refl
+  SubTran[[parm]] <- SubData[[parm]]$Tran
+
+  print('PROSPECT inversion using full spectral range')
+  res[[parm]] <- Invert_PROSPECT(SpecPROSPECT = SubSpecPROSPECT[[parm]],
+                                  Refl = SubRefl[[parm]], Tran = SubTran[[parm]],
+                                  PROSPECT_version = 'D', Parms2Estimate = Parms2Estimate,
+                                  InitValues = InitValues)
+
+  ########################################################################################
+  #####################################################################################
+  ##################################################################################
   
-  statsInv <- get_performances_inversion(target = Inversion_Ref1[[parm]]$measured,
-                                         estimate = Inversion_Ref1[[parm]]$estimated,
-                                         categories = T)
+  # compute statistics for inversion
+  ParmsOfInterest <- c('CHL', 'CAR', 'EWT', 'LMA')
+  UnitsParms <- list('CHL'='(µg/cm²)', 'CAR'='(µg/cm²)', 'EWT'='(mg/cm²)', 'LMA'='(mg/cm²)')
+  Factor <- list('CHL'=1, 'CAR'=1, 'EWT'=1000, 'LMA'=1000)
   
+
+  Inversion_Ref1[[parm]][[parm]] <- data.frame('measured' = Factor[[parm]]*Biochemistry[[parm]],
+                                       'estimated' = Factor[[parm]]*res[[parm]][[parm]])
+  
+  statsInv[[parm]] <- get_performances_inversion(target = Inversion_Ref1[[parm]][[parm]][["measured"]],
+                                          estimate = Inversion_Ref1[[parm]][[parm]][["estimated"]],
+                                          categories = T)
+   
   R2_Refl1[[parm]] <- statsInv$R2
   NRMSE_Refl1[[parm]] <- statsInv$NRMSE
+  
 }
-
 # save results
-for (parm in ParmsOfInterest){
+for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")){
   FileName <- file.path(PathResults,paste(parm,'_REFERENCE#1.RData',sep = ''))
-  ResultsInversion <- Inversion_Ref1[[parm]]
+  ResultsInversion <- Inversion_Ref1[[parm]][[parm]] 
   save(ResultsInversion ,file = FileName)
 }
   
@@ -87,12 +102,12 @@ for (parm in ParmsOfInterest){
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
 MinMax <- list('CHL' = c(0,120), 'CAR'  = c(0,30), 'LMA' = c(0,40), 'EWT' = c(0,60))
 PlotObj <- list()
-for (parm in ParmsOfInterest){
+for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")){
   Labs <- c(paste('Measured',parm,UnitsParms[[parm]]), 
             paste('Estimated',parm,UnitsParms[[parm]]))
   fileName <- file.path(PathResults,'FIGURES', paste(parm,'_REFERENCE#1.png',sep = ''))
-  PlotObj[[parm]] <- scatter_inversion(target = Inversion_Ref1[[parm]]$measured,
-                                       estimate = Inversion_Ref1[[parm]]$estimated,
+  PlotObj[[parm]] <- scatter_inversion(target = Inversion_Ref1[[parm]][[parm]]$measured,
+                                       estimate = Inversion_Ref1[[parm]][[parm]]$estimated,
                                        Colors = PlotCols[[parm]],
                                        Labs = Labs,
                                        fileName = fileName,
