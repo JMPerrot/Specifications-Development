@@ -1,30 +1,32 @@
 ################################################################################
-## This code aims at exploring the influence of spectral sampling on the 
-## performances of PROSPECT inversion
+## This code makes it possible to test different offset/shift values for the 
+## prospect model in order to follow the evolution of the precision of the 
+## model. There is no filter
 ################################################################################
+
 # Always start a script with a clean environment
 rm(list=ls(all=TRUE));gc()
 # define working directory as the directory where the script is located
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+################################################################################
 
-################################################################################
-# Libraries required
-################################################################################
+# Libraries required 
 library(tidyverse)
 library(prospect)
 library(data.table)
-library(doFuture)
-source('../Libraries/Lib_Plots.R')
-source('../Libraries/Lib_Analysis_Inversion.R')
+library(ggplot2)
+library(ggpubr)
+library(grid)
+library(gridExtra)
+source('../../../Libraries/Lib_Analysis_Inversion.R')
+source('../../../Libraries/Lib_Plots.R')
 
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../../01_DATA'
-PathResults <- '../../../03_RESULTS/R_only'
-SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
-dir.create(path = SpectralSampling_Dir,
-           showWarnings = F,recursive = T)
+PathData <- '../../../../01_DATA'
+PathResults <- '../../../../03_RESULTS/R_only/N_Prior/02_SpecSampling'
+dir.create(PathResults,showWarnings = F,recursive = T)
 
 ################################################################################
 # load leaf optics dataset
@@ -43,8 +45,8 @@ Parms2Estimate <- c('EWT_LMA')#,'CHL_CAR'
 Parms2Estimate_ind <- list('EWT_LMA'=c('EWT','LMA'))#,'CHL_CAR'=c('CHL','CAR')
 # define spectral sampling
 SpectralSampling <- list()
-SpectralSampling$CHL_CAR <- as.list(c(seq(2,50,by=1),seq(60,100,by=10)))
-SpectralSampling$EWT_LMA <- as.list(c(seq(2,50,by=1),seq(60,100,by=10),seq(120,400,by=20)))
+SpectralSampling$CHL_CAR <- as.list(c(seq(2,50,by=1)))
+SpectralSampling$EWT_LMA <- as.list(c(seq(2,50,by=1)))
 
 # define spectral domain
 SpectralDomain <- list()
@@ -53,13 +55,14 @@ SpectralDomain$EWT_LMA <- list('minWL' = 1300, 'maxWL' = 2400)
 
 # define parameters to estimate during inversion
 ParmsEstInv <- list()
-ParmsEstInv$CHL_CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
-ParmsEstInv$EWT_LMA <- c('EWT', 'LMA', 'N')
+ParmsEstInv$CHL_CAR <- c('CHL', 'CAR', 'EWT', 'LMA')
+ParmsEstInv$EWT_LMA <- c('EWT', 'LMA')
+N_prior <- Get_Nprior(SpecPROSPECT = SpecPROSPECT, lambda = lambda, Refl = Refl, Tran = Tran)
+
 
 # define parameters to estimate during inversion
 InitValues <- list()
-InitValues$CHL_CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-InitValues$EWT_LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
+InitValues <- data.frame(CHL=40, CAR=10, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=N_prior)
 
 ################################################################################
 # Perform inversion
@@ -100,7 +103,7 @@ for (parm in Parms2Estimate){
                                                 Tran = NULL,
                                                 PROSPECT_version = 'D',
                                                 Parms2Estimate = ParmsEstInv[[parm]],
-                                                InitValues = InitValues[[parm]])
+                                                InitValues = InitValues)
         save(Invert_est,file = FileName)
       } else {
         load(file = FileName)

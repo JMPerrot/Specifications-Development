@@ -58,7 +58,7 @@ SubData$LMA<-SubData$EWT <- FitSpectralData(SpecPROSPECT=SpecPROSPECT,
                                    lambda = lambda, Refl = Refl, Tran =Tran,
                                    UserDomain = c(1300,2400),
                                    UL_Bounds = TRUE)
-for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")) {
+for (parm in c("CHL","CAR","LMA","EWT")) {
   SubSpecPROSPECT[[parm]] <- SubData[[parm]]$SpecPROSPECT
   Sublambda[[parm]] <- SubData[[parm]]$lambda
   SubRefl[[parm]] <- SubData[[parm]]$Refl
@@ -66,9 +66,11 @@ for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")) {
 
   print('PROSPECT inversion using full spectral range')
   res[[parm]] <- Invert_PROSPECT(SpecPROSPECT = SubSpecPROSPECT[[parm]],
-                                  Refl = SubRefl[[parm]], Tran = SubTran[[parm]],
-                                  PROSPECT_version = 'D', Parms2Estimate = Parms2Estimate,
-                                  InitValues = InitValues)
+                                 Refl = SubRefl[[parm]], 
+                                 Tran = SubTran[[parm]],
+                                 PROSPECT_version = 'D', 
+                                 Parms2Estimate = Parms2Estimate,
+                                 InitValues = InitValues)
 
   ########################################################################################
   #####################################################################################
@@ -92,7 +94,7 @@ for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")) {
   
 }
 # save results
-for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")){
+for (parm in c("CHL","CAR","LMA","EWT")){
   FileName <- file.path(PathResults,paste(parm,'_REFERENCE#1.RData',sep = ''))
   ResultsInversion <- Inversion_Ref1[[parm]][[parm]] 
   save(ResultsInversion ,file = FileName)
@@ -102,7 +104,7 @@ for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")){
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
 MinMax <- list('CHL' = c(0,120), 'CAR'  = c(0,30), 'LMA' = c(0,40), 'EWT' = c(0,60))
 PlotObj <- list()
-for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")){
+for (parm in c("CHL","CAR","LMA","EWT")){
   Labs <- c(paste('Measured',parm,UnitsParms[[parm]]), 
             paste('Estimated',parm,UnitsParms[[parm]]))
   fileName <- file.path(PathResults,'FIGURES', paste(parm,'_REFERENCE#1.png',sep = ''))
@@ -119,3 +121,4 @@ for (parm in c("CAR")){#"CHL","CAR","LMA","EWT")){
 gg <- grid.arrange(grobs = PlotObj, ncol = 2)
 fileName <- file.path(PathResults,'FIGURES', 'All_REFERENCE#1.png')
 ggsave(fileName, gg,device = "png")
+

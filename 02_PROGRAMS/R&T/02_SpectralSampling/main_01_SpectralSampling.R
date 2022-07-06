@@ -39,12 +39,12 @@ Transmittance <- Transmittance[,-1]
 ################################################################################
 # Define parameters for inversion
 ################################################################################
-Parms2Estimate <- c("CAR")#c('EWT','LMA','CHL','CAR')
-Parms2Estimate_ind <- list('EWT','LMA','CHL','CAR')
+Parms2Estimate <- c('EWT','LMA','CHL','CAR')
+Parms2Estimate_ind <- list('EWT'=c('EWT'),"LMA"=c('LMA'),"CHL"=c('CHL'),"CAR"=c('CAR'))
 # define spectral sampling
 SpectralSampling <- list()
-SpectralSampling$CHL<-SpectralSampling$CAR <- as.list(c(seq(2,50,by=1),seq(60,100,by=10)))
-SpectralSampling$EWT<-SpectralSampling$LMA <- as.list(c(seq(2,50,by=1),seq(60,100,by=10),seq(120,400,by=20)))
+SpectralSampling$CHL<-SpectralSampling$CAR <- as.list(c(seq(1,50,by=1)))
+SpectralSampling$EWT<-SpectralSampling$LMA <- as.list(c(seq(2,50,by=1)))
 
 # define spectral domain
 SpectralDomain <- list()
@@ -53,13 +53,13 @@ SpectralDomain$EWT<-SpectralDomain$LMA <- list('minWL' = 1300, 'maxWL' = 2400)
 
 # define parameters to estimate during inversion
 ParmsEstInv <- list()
-ParmsEstInv$CHL<-ParmsEstInv$CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
-ParmsEstInv$EWT<-ParmsEstInv$LMA <- c('EWT', 'LMA', 'N')
+ParmsEstInv$CAR <- ParmsEstInv$CHL <- "ALL"
+ParmsEstInv$EWT <- ParmsEstInv$LMA <- c('EWT', 'LMA', 'N')
 
 # define parameters to estimate during inversion
 InitValues <- list()
-InitValues$CHL<-InitValues$CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.011, LMA=0.01, N=1.5)
-InitValues$EWT<-InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.011, LMA=0.01, N=1.5)
+InitValues <- data.frame(CHL=40, CAR=10, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
+
 
 ################################################################################
 # Perform inversion
@@ -78,11 +78,17 @@ for (parm in Parms2Estimate){
   # apply multiprocessing for each spectral sampling
   Invert_SpectralSampling <- function() {
     foreach(subsample = SpectralSampling[[parm]]) %dopar% {
-      if (subsample<10){subChar <- paste('00',as.character(subsample),sep = '')}
-      else if (subsample<100){subChar <- paste('0',as.character(subsample),sep = '')}
-      else if (subsample<1000){subChar <- as.character(subsample)}
+      Invert_est<-list()
+      if (subsample<10){
+        subChar <- paste('00',as.character(subsample),sep = '')
+      }else if (subsample<100){
+        subChar <- paste('0',as.character(subsample),sep = '')
+      }else if (subsample<1000){
+        subChar <- as.character(subsample)
+      }
       FileName <- file.path(SpectralSampling_subDir,
                             paste(parm,'_SpecSampling_',subChar,'.RData',sep = ''))
+      
       if (!file.exists(FileName)){
         lambda_tmp <- seq(from = SpectralDomain[[parm]]$minWL,
                           to = SpectralDomain[[parm]]$maxWL,
@@ -100,7 +106,7 @@ for (parm in Parms2Estimate){
                                                 Tran = DataFit$Tran,
                                                 PROSPECT_version = 'D',
                                                 Parms2Estimate = ParmsEstInv[[parm]],
-                                                InitValues = InitValues[[parm]])
+                                                InitValues = InitValues)
         save(Invert_est,file = FileName)
       } else {
         load(file = FileName)
@@ -130,10 +136,10 @@ for (parm in names(Estimate_SpectralSampling)){
 # # Produce figures
 # ################################################################################
 
-  # plot results
+# plot results
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
 MinMax <- list('CHL' = c(0,120), 'CAR'  = c(0,30), 'LMA' = c(0,40), 'EWT' = c(0,60))
-UnitsParms <- list('CHL'='(Âµg/cmÂ²)', 'CAR'='(Âµg/cmÂ²)', 'EWT'='(mg/cmÂ²)', 'LMA'='(mg/cmÂ²)')
+UnitsParms <- list('CHL'='(µg/cm²)', 'CAR'='(µg/cm²)', 'EWT'='(mg/cm²)', 'LMA'='(mg/cm²)')
 Factor <- list('CHL'=1, 'CAR'=1, 'EWT'=1000, 'LMA'=1000)
 PlotObj <- list()
 for (parm in names(Estimate_SpectralSampling)){

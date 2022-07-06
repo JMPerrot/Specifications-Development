@@ -1,29 +1,28 @@
 ################################################################################
-## This code summarizes the evolution of the performances of PROSPECT inversion
+## This code aims at exploring the influence of spectral sampling on the 
+## performances of PROSPECT inversion
 ################################################################################
 # Always start a script with a clean environment
 rm(list=ls(all=TRUE));gc()
 # define working directory as the directory where the script is located
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
-
-## Libraries required ----------------------------------------------------------
-
+################################################################################
+# Libraries required
+################################################################################
 library(tidyverse)
 library(prospect)
 library(data.table)
 library(doFuture)
-library(ggplot2)
+source('../../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
 
-source('../Libraries/Lib_Plots.R')
-source('../Libraries/Lib_Analysis_Inversion.R')
-
-
-## Input output directories ----------------------------------------------------
-
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
-Reference_Dir <- file.path(PathResults,'01_Reference')
+################################################################################
+# input output directories
+################################################################################
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/R&T'
+Reference_Dir <- file.path('../../../03_RESULTS','01_Reference')
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 
 
@@ -36,7 +35,7 @@ load(PathLOPdb)
 
 ## compute statistics ----------------------------------------------------------
 
-Parms2Estimate <- c('CHL','CAR','EWT','LMA')
+Parms2Estimate <- c('CHL','CAR','EWT','LMA')#
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
 for (parm in Parms2Estimate){
   # load reference#1 for inversion
@@ -132,3 +131,4 @@ ggsave(file.path(SpectralSampling_Dir,
                  paste('NRMSE_ALL','_SpectralSampling.png',sep = '')), 
        plot_nrmse,
        device = "png")
+

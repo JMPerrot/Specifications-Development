@@ -17,15 +17,15 @@ library(doFuture)
 library(ggpmisc)
 library(ggplot2)
 library(ggpubr)
-source('../Libraries/Lib_Plots.R')
-source('../Libraries/Lib_Analysis_Inversion.R')
+source('../../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
 
 
 ## input output directories ----------------------------------------------------
 
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
-Reference_Dir <- file.path(PathResults,'01_Reference')
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/R&T'
+Reference_Dir <- file.path('../../../03_RESULTS','01_Reference')
 SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
 
 

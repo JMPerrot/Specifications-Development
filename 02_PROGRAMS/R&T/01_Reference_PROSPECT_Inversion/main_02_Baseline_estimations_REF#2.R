@@ -18,14 +18,14 @@ library(ggplot2)
 library(ggpubr)
 library(grid)
 library(gridExtra)
-source('../Libraries/Lib_Analysis_Inversion.R')
-source('../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
+source('../../Libraries/Lib_Plots.R')
 
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS/01_Reference'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/01_Reference'
 dir.create(PathResults,showWarnings = F,recursive = T)
 ################################################################################
 # repository where data are stored
@@ -52,7 +52,7 @@ ParmEst <- Invert_PROSPECT_OPT(SpecPROSPECT = SpecPROSPECT, lambda = lambda,
 
 # compute statistics for inversion
 ParmsOfInterest <- c('CHL', 'CAR', 'EWT', 'LMA')
-UnitsParms <- list('CHL'='(Âµg/cmÂ²)', 'CAR'='(Âµg/cmÂ²)', 'EWT'='(mg/cmÂ²)', 'LMA'='(mg/cmÂ²)')
+UnitsParms <- list('CHL'='(µg/cm²)', 'CAR'='(µg/cm²)', 'EWT'='(mg/cm²)', 'LMA'='(mg/cm²)')
 Factor <- list('CHL'=1, 'CAR'=1, 'EWT'=1000, 'LMA'=1000)
 Inversion_Ref2 <- R2_Refl2 <- NRMSE_Refl2 <- list()
 for (parm in ParmsOfInterest){
