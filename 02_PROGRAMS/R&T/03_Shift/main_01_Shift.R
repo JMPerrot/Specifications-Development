@@ -14,14 +14,14 @@ library(tidyverse)
 library(prospect)
 library(data.table)
 library(doFuture)
-source('../Libraries/Lib_Plots.R')
-source('../Libraries/Lib_Analysis_Inversion.R')
+source('../../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
 
 
 # input output directories -----------------------------------------------------
 
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/R&T'
 SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 dir.create(path = SpectralShifting_Dir, showWarnings = F,recursive = T)
@@ -43,8 +43,8 @@ Transmittance <- Transmittance[,-1]
 
 # Define parameters for inversion ----------------------------------------------
 
-Parms2Estimate <- c('CHL')#EWT','LMA','CHL','CAR')#
-Parms2Estimate_ind <- list('CHL'=c('CHL'))#,'EWT'= 'EWT','LMA'=c('LMA'),'CAR'=c('CAR'))#
+Parms2Estimate <- c('EWT','LMA','CHL','CAR')#
+Parms2Estimate_ind <- list('CHL'=c('CHL'),'EWT'= 'EWT','LMA'=c('LMA'),'CAR'=c('CAR'))#
 
 Stats<-list()
 Opt_Sampling<-list()
@@ -74,8 +74,7 @@ ParmsEstInv$EWT<-ParmsEstInv$LMA <- c('EWT', 'LMA', 'N')
 
 # define parameters to estimate during inversion
 InitValues <- list()
-InitValues$CHL<-InitValues$CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-InitValues$EWT<-InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
+InitValues <- data.frame(CHL=40, CAR=10, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
 
 
 # Perform inversion ------------------------------------------------------------
@@ -95,8 +94,8 @@ for (parm in Parms2Estimate){
   Invert_SpectralShifting <- function() {
     foreach(subshifting = c(0:max(unlist(SpectralSampling)))) %dopar% {
       SpectralDomain <- list()
-      SpectralDomain$CHL<-SpectralDomain$CAR <- list('minWL' = 400 +subshifting, 'maxWL' = 900)  #+subshifting)
-      SpectralDomain$EWT<-SpectralDomain$LMA <- list('minWL' = 1300+subshifting, 'maxWL' = 2400)#+subshifting)
+      SpectralDomain$CHL<-SpectralDomain$CAR <- list('minWL' = 400 + subshifting, 'maxWL' = 900) 
+      SpectralDomain$EWT<-SpectralDomain$LMA <- list('minWL' = 1300+subshifting, 'maxWL' = 2400)
       if (subshifting<10){
         subChar <- paste('00',as.character(subshifting),sep = '')
       }else if (subshifting<100){
@@ -123,7 +122,7 @@ for (parm in Parms2Estimate){
                                                 Tran = DataFit$Tran,
                                                 PROSPECT_version = 'D',
                                                 Parms2Estimate = ParmsEstInv[[parm]],
-                                                InitValues = InitValues[[parm]])
+                                                InitValues = InitValues)
         save(Invert_est,file = FileName)
       } else {
         load(file = FileName)
