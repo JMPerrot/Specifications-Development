@@ -21,8 +21,8 @@ source('../../Libraries/Lib_Analysis_Inversion.R')
 ## Scripts required ------------------------------------------------------------
 
 # source("../00_WriteDatabase/01_Write_Database.r")
-source("../01_Reference_PROSPECT_Inversion/01_Baseline_estimations_REF#1.R")
-source("../01_Reference_PROSPECT_Inversion/01_Baseline_estimations_REF#2.R")
+# source("../01_Reference_PROSPECT_Inversion/01_Baseline_estimations_REF#1.R")
+# source("../01_Reference_PROSPECT_Inversion/01_Baseline_estimations_REF#2.R")
 
 source("../02_SpectralSampling/main_01_SpectralSampling.R")
 source("../02_SpectralSamplingmain_02_plot_SpectralSampling.R")

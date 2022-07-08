@@ -61,15 +61,15 @@ SpectralSampling$LMA <- 45
 SpectralSampling$EWT <- 45
 # define spectral domain
 minlambda <- list()
-minlambda$CHL <- c(0:max(unlist(SpectralSampling)))
-minlambda$EWT <- c(0:max(unlist(SpectralSampling)))
-minlambda$CAR <- c(0:max(unlist(SpectralSampling)))
-minlambda$LMA <- c(0:max(unlist(SpectralSampling)))
+minlambda$CHL <- c(0:max(SpectralSampling[["CHL"]]))
+minlambda$EWT <- c(0:max(SpectralSampling[["EWT"]]))
+minlambda$CAR <- c(0:max(SpectralSampling[["CAR"]]))
+minlambda$LMA <- c(0:max(SpectralSampling[["LMA"]]))
 
 
 # define parameters to estimate during inversion
 ParmsEstInv <- list()
-ParmsEstInv$CHL<-ParmsEstInv$CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
+ParmsEstInv$CHL<-ParmsEstInv$CAR <- "ALL"
 ParmsEstInv$EWT<-ParmsEstInv$LMA <- c('EWT', 'LMA', 'N')
 
 # define parameters to estimate during inversion
@@ -92,10 +92,11 @@ for (parm in Parms2Estimate){
   print(parm)
   # apply multiprocessing for each spectral sampling
   Invert_SpectralShifting <- function() {
-    foreach(subshifting = c(0:max(unlist(SpectralSampling)))) %dopar% {
-      SpectralDomain <- list()
+    foreach(subshifting = c(0:max(unlist(minlambda)))) %dopart% {#minlambda[[parm]]) %dopar% {
+      SpectralDomain <- Invert_est <- list()
       SpectralDomain$CHL<-SpectralDomain$CAR <- list('minWL' = 400 + subshifting, 'maxWL' = 900) 
       SpectralDomain$EWT<-SpectralDomain$LMA <- list('minWL' = 1300+subshifting, 'maxWL' = 2400)
+      
       if (subshifting<10){
         subChar <- paste('00',as.character(subshifting),sep = '')
       }else if (subshifting<100){

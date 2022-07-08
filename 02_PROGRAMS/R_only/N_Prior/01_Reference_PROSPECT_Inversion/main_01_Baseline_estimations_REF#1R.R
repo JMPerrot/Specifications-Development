@@ -43,14 +43,17 @@ Tran <- Transmittance[,-1]
 nbSamples <- ncol(Refl)
 
 # Estimate all parameters for PROSPECT-D
-Parms2Estimate  = c('EWT','LMA','CHL','CAR')
+Parms2Estimate<-list()
+Parms2Estimate$CHL<-Parms2Estimate$CAR  <- c('EWT','LMA','CHL','CAR')
+Parms2Estimate$LMA<-Parms2Estimate$EWT  <- c('EWT','LMA')
+
 N_prior <- Get_Nprior(SpecPROSPECT = SpecPROSPECT, 
                       lambda = lambda, 
                       Refl = Refl, 
-                      Tran = Tran,
+                      Tran = NULL,
                       OptWL_R = list(NIR = 800, SWIR = 1131),  
                       OptWL_T = list(NIR = 753, SWIR = 1121))
-InitValues <- data.frame(CHL=40, CAR=10, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=N_prior)
+InitValues <- data.frame(CHL=rep(40,308), CAR=rep(10,308), ANT=rep(0.1,308), BROWN=rep(0,308), EWT=rep(0.01,308), LMA=rep(0.01,308), N=N_prior)
 
 # Adjust spectral domain for SpecPROSPECT to fit leaf optical properties 
 SubData<-list()
@@ -78,12 +81,12 @@ for (parm in c("CHL","CAR","LMA","EWT")) {
                                  Refl = SubRefl[[parm]], 
                                  Tran = NULL,
                                  PROSPECT_version = 'D', 
-                                 Parms2Estimate = Parms2Estimate,
+                                 Parms2Estimate = Parms2Estimate[[parm]],
                                  InitValues = InitValues)
   
   # compute statistics for inversion
   ParmsOfInterest <- c('CHL', 'CAR', 'EWT', 'LMA')
-  UnitsParms <- list('CHL'='(µg/cm²)', 'CAR'='(µg/cm²)', 'EWT'='(mg/cm²)', 'LMA'='(mg/cm²)')
+  UnitsParms <- list('CHL'='(?g/cm?)', 'CAR'='(?g/cm?)', 'EWT'='(mg/cm?)', 'LMA'='(mg/cm?)')
   Factor <- list('CHL'=1, 'CAR'=1, 'EWT'=1000, 'LMA'=1000)
   
   

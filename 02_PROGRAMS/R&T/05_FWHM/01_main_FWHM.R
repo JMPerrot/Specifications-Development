@@ -21,9 +21,9 @@ library(tidyverse)
 library(Metrics)
 library(progress)
 library(ggpubr)
-source('../Libraries/Lib_Gaussian_filter.R')
-source('../Libraries/Lib_Analysis_Inversion.R')
-source('../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Gaussian_filter.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
+source('../../Libraries/Lib_Plots.R')
 ################################################################################
 # input output directories
 ################################################################################
@@ -38,7 +38,7 @@ dir.create(path = PathSRF,showWarnings = F,recursive = T)
 dbName <- 'ANGERS'
 PathLOPdb <- file.path(PathData,dbName,'LeafOptics.RData')
 load(PathLOPdb)
-load(file.path(PathResults,'01_Reference/REF#1.RData'))
+
 
 ################################################################################
 # Sensor simulation
@@ -54,17 +54,26 @@ List_FWHM <- list(1,2,3,4,5,10,15,20,25)
 # save results
 DirSave_Root <- file.path(PathSRF,'SRF_fwhm_')
 wavelenght_tested <- list()
-wavelenght_tested$CHL <- c(714,849)
-wavelenght_tested$CAR <- c(518, 557)
+wavelenght_tested$CHL <- c(706,784,511)
+wavelenght_tested$CAR <- c(518, 558)
 wavelenght_tested$EWT <- c(1792,2332,2017,1882)
 wavelenght_tested$LMA <- c(1882,1747,1477,2287)
 List_FWHM_to_do <- list()
 parm2estimate = c("CHL","CAR","LMA","EWT")
 PROSPECT_inv<- list()
+REF_1<-list()
+
+for (parm in parm2estimate){
+  load(file.path('../../../03_RESULTS/01_Reference', paste(parm,'_REFERENCE#1.RData', sep = "")))
+  REF_1[[parm]]$measured<-ResultsInversion$measured
+  REF_1[[parm]]$estimated<-ResultsInversion$estimated
+}
+
 
 for (parm in parm2estimate) {
   for (fwhm in List_FWHM){
     SRF_Dir <- paste(DirSave_Root, as.character(fwhm), 'nm',sep = '')
+    dir.create(path = SRF_Dir,showWarnings = F,recursive = T)
     if (!file.exists(file.path(SRF_Dir,paste(parm,"_Results_Invert_PROSPECT.RData", sep = "")))){
       List_FWHM_to_do<- append(List_FWHM_to_do,fwhm)
     }else{
@@ -72,10 +81,6 @@ for (parm in parm2estimate) {
     }
   }
   List_FWHM_to_do <- unlist(List_FWHM_to_do)
-  # PROSPECT_inv[[parm]] <- lapply(X = List_FWHM_to_do,FUN =  Invert_PROSPECT_GaussianFilter_fwhm,
-  #                      Sampling_in = lambda, Refl = Refl, Tran = Tran,
-  #                      wavelenght_tested= wavelenght_tested[parm], parm = parm)
-
   i <- 0
   plots<-list()
   PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
@@ -107,7 +112,7 @@ for (parm in parm2estimate) {
 
 #############################################################################################
 ## compute statistics ----------------------------------------------------------
-Reference_Dir <- file.path(PathResults,'01_Reference')
+Reference_Dir <- file.path('../../../03_RESULTS/01_Reference')
 Parms2Estimate <- c('CHL','CAR','EWT','LMA')#
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
 for (parm in Parms2Estimate){

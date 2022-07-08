@@ -17,8 +17,8 @@ library(tidyverse)
 library(prospect)
 library(data.table)
 library(ggpubr)
-source('../Libraries/Lib_Plots.R')
-source('../Libraries/Lib_Analysis_Inversion.R')
+source('../../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
 
 ################################################################################
 # input output directories
@@ -29,7 +29,7 @@ SFS_Dir <- file.path(PathResults,'04_FeatureSelection')
 dir.create(path = SFS_Dir,showWarnings = F,recursive = T)
 SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
 SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
-Reference_Dir <- file.path(PathResults,'01_Reference')
+Reference_Dir <- file.path( '../../../03_RESULTS/01_Reference')
 
 
 
