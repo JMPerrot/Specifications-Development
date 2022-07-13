@@ -17,16 +17,16 @@ library(doFuture)
 library(ggpmisc)
 library(ggplot2)
 library(ggpubr)
-source('../Libraries/Lib_Plots.R')
-source('../Libraries/Lib_Analysis_Inversion.R')
+source('../../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
 
 
 ## input output directories ----------------------------------------------------
 
 PathData <- '../../../01_DATA'
-PathResults <- '../../../03_RESULTS/R_only'
+PathResults <- '../../../03_RESULTS/T_only_N_Prior'
 Reference_Dir <- file.path(PathResults,'01_Reference')
-SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
+SpecShifting_Dir <- file.path(PathResults,'03_SpecShifting')
 
 
 ## load leaf optics dataset ----------------------------------------------------
@@ -38,20 +38,20 @@ load(PathLOPdb)
 
 ## compute statistics ----------------------------------------------------------
 
-Parms2Estimate <- c('CHL','CAR','EWT','LMA')#
+ParmsofInterest <- c('CHL','CAR','EWT','LMA')#
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
-for (parm in Parms2Estimate){
+for (parm in ParmsofInterest){
   
   # load reference#1 for inversion
-  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#1.RData',sep = ''))
+  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#1_T_N.RData',sep = ''))
   load(FileName)
   Ref1 <- ResultsInversion
   # load reference#2 for inversion
-  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#2.RData',sep = ''))
+  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#2_T_N.RData',sep = ''))
   load(FileName)
   Ref2 <- ResultsInversion
   # load inversion results for spectral samplings
-  FileName <- file.path(SpectralShifting_Dir,paste(parm,'_SpecShifting.csv',sep = ''))
+  FileName <- file.path(SpecShifting_Dir,paste(parm,'_SpecShifting.csv',sep = ''))
   SpecShifting <- readr::read_delim(file = FileName,delim = '\t')
 
   # compute performances
@@ -82,7 +82,7 @@ for (parm in Parms2Estimate){
 
 ## save Statistics -------------------------------------------------------------
 for (parm in names(Stats_inversion_SS)){
-  FileName <- file.path(SpectralShifting_Dir,paste(parm,'_Statistics.csv',sep = ''))
+  FileName <- file.path(SpecShifting_Dir,paste(parm,'_Statistics.csv',sep = ''))
   write_delim(x = Stats_inversion_SS[[parm]],
               file = FileName,
               delim = '\t',
@@ -97,7 +97,7 @@ for (parm in names(Stats_inversion_SS)){
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
 
 plot0 <- list()
-for (parm in Parms2Estimate){
+for (parm in ParmsofInterest){
   plot0[[parm]] <- ggplot(Stats_inversion_SS[[parm]], aes(x = Sampling, y = NRMSE)) +
     geom_line(aes(x = Sampling, y = NRMSE), colour = PlotCols[[parm]], size = 1) +
     labs(x="Spectral shifting (nm)",y="NRMSE (%)") +
@@ -114,7 +114,7 @@ for (parm in Parms2Estimate){
                                                              size = 10))
   
   
-  filename = file.path(SpectralShifting_Dir,paste('NRMSE_',parm,'_SpectralShifting.png',sep = ''))
+  filename = file.path(SpecShifting_Dir,paste('NRMSE_',parm,'_SpecShifting.png',sep = ''))
   ggsave(filename,plot = plot0[[parm]], device = "png", path = NULL,
          scale = 1, width = 20, height = 13, units = "cm",
          dpi = 600)
@@ -145,8 +145,8 @@ plot_nrmse<- ggpubr::annotate_figure(plot_nrmse1,
                                                         size = 14))
 
 ## save figures ----------------------------------------------------------------
-ggsave(file.path(SpectralShifting_Dir,
-                 paste('NRMSE_ALL','_SpectralShifting.png',sep = '')), 
+ggsave(file.path(SpecShifting_Dir,
+                 paste('NRMSE_ALL','_SpecShifting.png',sep = '')), 
        plot_nrmse,
        device = "png")
 

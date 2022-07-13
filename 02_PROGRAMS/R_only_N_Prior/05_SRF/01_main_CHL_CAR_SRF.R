@@ -21,8 +21,8 @@ source('../Libraries/Lib_Analysis_Inversion.R')
 # input output directories
 ################################################################################
 PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS'
-SRF_Dir <- file.path(PathResults,'06_SRF')
+PathResults <- '../../03_RESULTS.R_only_N_Prior'
+SRF_Dir <- file.path(PathResults,'05_SRF')
 dir.create(path = SRF_Dir,showWarnings = F,recursive = T)
 ################################################################################
 # repository where data are stored
@@ -91,7 +91,7 @@ for (i in c("CHL")){
   fileName = paste(SRF_Dir_Fig,paste("/SRF",i,".png", sep=""), sep = "")
   
   if(i=="CHL"){
-    scatter_inversion(target = Biochemistry$CHLa+Biochemistry$CHLb,
+    scatter_inversion(target = Biochemistry$CHL,
                       estimate = parms_est_df$CHL,
                       Colors = "#66CC00", 
                       fileName = fileName, 
@@ -107,7 +107,7 @@ for (i in c("CHL")){
                       fileName = fileName, 
                       Labs = list("Mesured CAR","Estimated CAR"),
                       PlotStats = TRUE,
-                      categories = "RT")
+                      categories = "R_N")
   }
 }
 

@@ -22,9 +22,9 @@ source('../../Libraries/Lib_Analysis_Inversion.R')
 # input output directories -----------------------------------------------------
 
 PathData <- '../../../01_DATA'
-PathResults <- '../../../03_RESULTS/R_only'
-SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
-SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
+PathResults <- '../../../03_RESULTS/R_only_N_Prior'
+SpectralShifting_Dir <- file.path(PathResults,'03_SpecShifting')
+SpectralSampling_Dir <- file.path(PathResults,'02_SpecSampling')
 dir.create(path = SpectralShifting_Dir, showWarnings = F,recursive = T)
 
 
@@ -34,14 +34,13 @@ dir.create(path = SpectralShifting_Dir, showWarnings = F,recursive = T)
 
 
 # load leaf optics dataset -----------------------------------------------------
-
 dbName <- 'ANGERS'
 PathLOPdb <- file.path(PathData,dbName,'LeafOptics.RData')
 load(PathLOPdb)
-lambda <- Reflectance[,1]
+lambda <- Reflectance$V1
 Reflectance <- Reflectance[,-1]
-Transmittance <- Transmittance[,-1]
-
+Transmittance<- Transmittance[,-1]
+nbSamples <- ncol(Reflectance)
 
 # Define parameters for inversion ----------------------------------------------
 
@@ -59,8 +58,8 @@ for (parm in Parms2Estimate){
 SpectralSampling <- list()
 SpectralSampling$CHL <- Opt_Sampling$CHL
 SpectralSampling$CAR <- Opt_Sampling$CAR
-SpectralSampling$LMA <- 50#Opt_Sampling$LMA
-SpectralSampling$EWT <- 65#Opt_Sampling$EWT
+SpectralSampling$LMA <- 39#Opt_Sampling$LMA
+SpectralSampling$EWT <- 31#Opt_Sampling$EWT
 # define spectral domain
 minlambda <- list()
 minlambda$CHL <- c(0:SpectralSampling$CHL)#max(unlist(SpectralSampling)))
@@ -71,15 +70,20 @@ minlambda$LMA <- c(0:SpectralSampling$LMA)#max(unlist(SpectralSampling)))
 
 # define parameters to estimate during inversion
 ParmsEstInv <- list()
-ParmsEstInv$CHL<-ParmsEstInv$CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
-ParmsEstInv$EWT<-ParmsEstInv$LMA <- c('EWT', 'LMA', 'N')
+ParmsEstInv$CHL<-ParmsEstInv$CAR <- "ALL"
+ParmsEstInv$EWT<-ParmsEstInv$LMA <- c('EWT', 'LMA')
 
 # define parameters to estimate during inversion
 
-InitValues <- list()
-InitValues$CHL<-InitValues$CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-InitValues$EWT<-InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.015, LMA=0.01, N=1.5)
+N_prior <- Get_Nprior(SpecPROSPECT = SpecPROSPECT, lambda = lambda, Refl = Reflectance, Tran = NULL)
 
+
+# define parameters to estimate during inversion
+InitValues <- list()
+InitValues<-list()
+for (i in c(1:nbSamples)) {
+  InitValues[[i]] <- data.frame("CHL"=40, "CAR"=10, "ANT"=0.1, "BROWN"=0, "EWT"=0.01, "LMA"=0.01, "N"=N_prior[i,])
+}
 
 # Perform inversion ------------------------------------------------------------
 
@@ -121,12 +125,16 @@ for (parm in Parms2Estimate){
                                    UserDomain = lambda_tmp,
                                    UL_Bounds = FALSE)
         
-        Invert_est <- prospect::Invert_PROSPECT(SpecPROSPECT = DataFit$SpecPROSPECT,
-                                                Refl = DataFit$Refl,
-                                                Tran = NULL,
-                                                PROSPECT_version = 'D',
-                                                Parms2Estimate = ParmsEstInv[[parm]],
-                                                InitValues = InitValues[[parm]])
+        Invert_est<-list()
+        for (i in c(1:nbSamples)) {
+          Invert <- prospect::Invert_PROSPECT(SpecPROSPECT = DataFit$SpecPROSPECT,
+                                              Refl = DataFit$Refl[[i]],
+                                              Tran = NULL,
+                                              PROSPECT_version = 'D',
+                                              Parms2Estimate = ParmsEstInv[[parm]],
+                                              InitValues = InitValues[[i]])
+          Invert_est<-rbind(Invert_est,Invert)
+        }
         save(Invert_est,file = FileName)
       } else {
         load(file = FileName)
@@ -158,7 +166,7 @@ for (parm in names(Estimate_SpectralShifting)){
 
 # plot results
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
-MinMax <- list('CHL' = c(0,110), 'CAR'  = c(0,130), 'LMA' = c(0,165), 'EWT' = c(0,160))
+MinMax <- list('CHL' = c(0,110), 'CAR'  = c(0,50), 'LMA' = c(0,65), 'EWT' = c(0,60))
 UnitsParms <- list('CHL'='(µg/cm²)', 'CAR'='(µg/cm²)', 'EWT'='(mg/cm²)', 'LMA'='(mg/cm²)')
 Factor <- list('CHL'= 1, 'CAR' = 1, 'EWT'= 1000, 'LMA'= 1000)
 PlotObj <- list()

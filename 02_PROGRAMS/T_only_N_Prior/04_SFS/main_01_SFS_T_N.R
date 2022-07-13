@@ -23,11 +23,11 @@ source('../../Libraries/Lib_Analysis_Inversion.R')
 # input output directories
 ################################################################################
 PathData <- '../../../01_DATA'
-PathResults <- '../../../03_RESULTS/R_only'
+PathResults <- '../../../03_RESULTS/T_only_N_Prior'
 SFS_Dir <- file.path(PathResults,'04_FeatureSelection')
 dir.create(path = SFS_Dir,showWarnings = F,recursive = T)
-SpectralSampling_Dir <- file.path(PathResults,'02_SpectralSampling')
-SpectralShifting_Dir <- file.path(PathResults,'03_SpectralShifting')
+SpectralSampling_Dir <- file.path(PathResults,'02_SpecSampling')
+SpectralShifting_Dir <- file.path(PathResults,'03_SpecShifting')
 Reference_Dir <- file.path(PathResults,'01_Reference')
 
 
@@ -41,15 +41,15 @@ load(PathLOPdb)
 
 ## compute statistics ----------------------------------------------------------
 
-Parms2Estimate <- c('CHL','CAR','EWT','LMA')
+Parms2Estimate <- c('CHL','CAR','LMA','EWT')#
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
 for (parm in Parms2Estimate){
   # load reference#1 for inversion
-  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#1.RData',sep = ''))
+  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#1_T_N.RData',sep = ''))
   load(FileName)
   Ref1 <- ResultsInversion
   # load reference#2 for inversion
-  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#2.RData',sep = ''))
+  FileName <- file.path(Reference_Dir,paste(parm,'_REFERENCE#2_T_N.RData',sep = ''))
   load(FileName)
   Ref2 <- ResultsInversion
   
@@ -73,6 +73,7 @@ load(PathLOPdb)
 lambda <- Reflectance$V1
 Reflectance <- Reflectance[,-1]
 Transmittance <- Transmittance[,-1]
+nbSamples<-ncol(Reflectance)
 
 ################################################################################
 # Which spectral sampling to be used?
@@ -89,9 +90,9 @@ for (parm in Parms2Estimate){
   if (parm =='CHL' | parm =='CAR'){
     Opt_Sampling[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]
   } else if (parm =='LMA'){
-    Opt_Sampling[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]/4
+    Opt_Sampling[[parm]] <- 39#Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]
   }else if (parm =='EWT'){
-    Opt_Sampling[[parm]] <- Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]/4
+    Opt_Sampling[[parm]] <- 31#Stats[[parm]]$Sampling[which(Stats[[parm]]$NRMSE==min(Stats[[parm]]$NRMSE))]
   }
 }
 
@@ -100,17 +101,18 @@ for (parm in Parms2Estimate){
 ################################################################################
 # define parameters to estimate during inversion
 ParmsEstInv <- list()
-ParmsEstInv$CHL <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
-ParmsEstInv$CAR <- c('CHL', 'CAR', 'EWT', 'LMA', 'N')
-ParmsEstInv$EWT <- c('EWT', 'LMA', 'N')
-ParmsEstInv$LMA <- c('EWT', 'LMA', 'N')
+ParmsEstInv$CHL <- ParmsEstInv$CAR <- c('CHL', 'CAR','ANT', 'EWT', 'LMA')
+ParmsEstInv$EWT <- ParmsEstInv$LMA <- c('EWT', 'LMA')
+ 
+# define parameters to estimate during inversion
 
+N_prior <- Get_Nprior(SpecPROSPECT = SpecPROSPECT, lambda = lambda, Refl = Reflectance, Tran = NULL)
 # define parameters to estimate during inversion
 InitValues <- list()
-InitValues$CHL <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-InitValues$CAR <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-InitValues$EWT <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
-InitValues$LMA <- data.frame(CHL=45, CAR=8, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N=1.5)
+InitValues<-list()
+for (i in c(1:nbSamples)) {
+  InitValues[[i]] <- data.frame("CHL"=40, "CAR"=10, "ANT"=0.1, "BROWN"=0, "EWT"=0.01, "LMA"=0.01, "N"=N_prior[i,])
+}
 
 ################################################################################
 # Perform SFS reduce spectral information
@@ -163,12 +165,12 @@ for (parm in Parms2Estimate){
     pb <- progress_bar$new(
       format = "PROSPECT inversion [:bar] :percent in :elapsedfull",
       total = TotalWL, clear = FALSE, width= 100)
-    for (nbvars2select in 1:(TotalWL-1)){
+    for (nbvars2select in c(1:(TotalWL-1))){
       pb$tick()
       nbVars <- length(AllWL)
       NumVar_list <- as.list(seq(1,length(AllWL)))
       ResWL0 <- as.list(seq(1,length(AllWL)))
-      backward_SFS <- function() {
+      backward_SFS <-function() {
         foreach(numvar = NumVar_list) %dopar% {
           # eliminate spectral band
           SelectedWLTmp <- SelectedWL[-numvar]
@@ -180,12 +182,16 @@ for (parm in Parms2Estimate){
                                      UserDomain = SelectedWLTmp,
                                      UL_Bounds = FALSE)
           # perform PROSPECT inversion
-          Invert_est <- prospect::Invert_PROSPECT(SpecPROSPECT = DataFit$SpecPROSPECT,
-                                                  Refl = DataFit$Refl,
-                                                  Tran = NULL,
-                                                  PROSPECT_version = 'D',
-                                                  Parms2Estimate = ParmsEstInv[[parm]],
-                                                  InitValues = InitValues[[parm]],progressBar = FALSE)
+          Invert_est<-list()
+          for (i in c(1:nbSamples)) {
+            Invert <- prospect::Invert_PROSPECT(SpecPROSPECT = DataFit$SpecPROSPECT,
+                                                Refl = NULL,
+                                                Tran = DataFit$Tran[[i]],
+                                                PROSPECT_version = 'D',
+                                                Parms2Estimate = ParmsEstInv[[parm]],
+                                                InitValues = InitValues[[i]])
+            Invert_est<-rbind(Invert_est,Invert)
+          }
           # compute performances for target parameter
           Stats_inversion <- get_performances_inversion(target = Biochemistry[[parm]],
                                                         estimate = Invert_est[[parm]], 
@@ -280,7 +286,7 @@ plot_parm<- ggpubr::annotate_figure(plot_parm1,
                                                         size = 14))
 ## save figures ----------------------------------------------------------------
 ggsave(file.path(SFS_Dir,
-                 paste('NRMSE_ALL_','SFS.png',sep = '')), 
+                 paste('NRMSE_ALL_','SFS_T_N.png',sep = '')), 
        plot_parm,
        device = "png")
 
