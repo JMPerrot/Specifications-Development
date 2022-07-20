@@ -106,7 +106,7 @@ ParmsEstInv$EWT <- ParmsEstInv$LMA <- c('EWT', 'LMA')
  
 # define parameters to estimate during inversion
 
-N_prior <- Get_Nprior(SpecPROSPECT = SpecPROSPECT, lambda = lambda, Refl = Reflectance, Tran = NULL)
+N_prior <- Get_Nprior(SpecPROSPECT = SpecPROSPECT, lambda = lambda, Refl = NULL, Tran = Transmittance)
 # define parameters to estimate during inversion
 InitValues <- list()
 InitValues<-list()

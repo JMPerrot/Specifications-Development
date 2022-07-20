@@ -14,14 +14,14 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 library(tidyverse)
 library(prospect)
 library(data.table)
-source('../Libraries/Lib_Plots.R')
-source('../Libraries/Lib_Analysis_Inversion.R')
+source('../../Libraries/Lib_Plots.R')
+source('../../Libraries/Lib_Analysis_Inversion.R')
 
 ################################################################################
 # input output directories
 ################################################################################
-PathData <- '../../01_DATA'
-PathResults <- '../../03_RESULTS.R_only_N_Prior'
+PathData <- '../../../01_DATA'
+PathResults <- '../../../03_RESULTS/R_only_N_Prior'
 SRF_Dir <- file.path(PathResults,'05_SRF')
 dir.create(path = SRF_Dir,showWarnings = F,recursive = T)
 ################################################################################
@@ -46,7 +46,7 @@ for (i in c("CHL")){
     # definition of the sampling step
     ############################################################################
     if (i == "CHL"){
-      wl<-c(714,849)
+      wl<-c(714,849)#(802 et 717)
     }else{
       wl<-c(477,516,594,672)
     }

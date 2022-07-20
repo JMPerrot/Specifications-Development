@@ -244,7 +244,7 @@ for (parm in Parms2Estimate){
   }
   # load inversion results for spectral samplings
   
-  fileplot<-file.path(SFS_Dir,paste(parm,'_FeatureSelection.png',sep = ''))
+  fileplot<-file.path(SFS_Dir,paste(parm,'_FeatureSelection_R_N.png',sep = ''))
   
   plotparm[[parm]]<-ggplot(SpecSampling, aes(x = seq(length(Discarded_WL),1, -1), y = NRMSE))+
     geom_line(aes(x = seq(length(Discarded_WL),1, -1), y = NRMSE), colour = PlotCols[[parm]], size = 1)+
@@ -254,7 +254,7 @@ for (parm in Parms2Estimate){
     geom_abline(slope = 0, intercept = Stats_inversion_Ref[[parm]]$REF1$NRMSE, linetype='dashed',size=1,col='black') +
     geom_abline(slope = 0, intercept = Stats_inversion_Ref[[parm]]$REF2$NRMSE,linetype='dashed',size=1,col='green')
   
-  filename_plot<- file.path(SFS_Dir,paste(parm,'_FeatureSelection.png',sep = ''))
+  filename_plot<- file.path(SFS_Dir,paste(parm,'_FeatureSelection_R_N.png',sep = ''))
   
   ggsave(filename_plot,plot = plotparm[[parm]], device = "png", path = NULL,
          scale = 1, width = 20, height = 13, units = "cm",
@@ -286,7 +286,7 @@ plot_parm<- ggpubr::annotate_figure(plot_parm1,
                                                         size = 14))
 ## save figures ----------------------------------------------------------------
 ggsave(file.path(SFS_Dir,
-                 paste('NRMSE_ALL_','SFS.png',sep = '')), 
+                 paste('NRMSE_ALL_','SFS_R_N.png',sep = '')), 
        plot_parm,
        device = "png")
 

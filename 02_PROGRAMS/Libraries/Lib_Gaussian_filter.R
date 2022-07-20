@@ -116,12 +116,12 @@ Invert_PROSPECT_GaussianFilter <- function(Sampling_in, Refl, Tran, fwhm, minWL_
 #' @importFrom progress progressbar
 #' @export
 
-Invert_PROSPECT_GaussianFilter_fwhm <- function(Sampling_in, Refl, Tran, fwhm, wavelenght_tested,parm){
+Invert_PROSPECT_GaussianFilter_fwhm <- function(Sampling_in, Refl = NULL, Tran = NULL, fwhm, wavelenght, Parms2Estimate = "ALL", InitValues, parm){
   
   minWL <- min(Sampling_in)#min(lambda)
   maxWL <- max(Sampling_in)#max(lambda)
   # define spectral sampling based on minWL, minWL_OUT, FWHM
-  wl <- wavelenght_tested                          #wavelength range
+  wl <- wavelenght                          #wavelength range
   SpectralProps <- data.frame('wl'= unlist(wl),'fwhm'=fwhm)#wl group by fwhm in data.frame
   SensorName <-paste(parm,'_Filter_',fwhm,sep='')
   SRF <- prosail::GetRadiometry(SpectralProps = SpectralProps,
@@ -129,7 +129,7 @@ Invert_PROSPECT_GaussianFilter_fwhm <- function(Sampling_in, Refl, Tran, fwhm, w
                                 Path_SensorResponse = SRF_Dir,
                                 SaveSRF = FALSE)
   # Inversion
-  Parms2Estimate <- "ALL"
+  
   SpecPROSPECT_Sensor <- data.frame(prosail::applySensorCharacteristics(wvl = SpecPROSPECT$lambda,
                                                                         InRefl = SpecPROSPECT,
                                                                         SRF = SRF))
@@ -148,7 +148,8 @@ Invert_PROSPECT_GaussianFilter_fwhm <- function(Sampling_in, Refl, Tran, fwhm, w
                                   Refl = Rtmp,
                                   Tran = Ttmp,
                                   Parms2Estimate = Parms2Estimate,
-                                  PROSPECT_version = 'D')
+                                  PROSPECT_version = 'D',
+                                  InitValues = InitValues)
     parms_est_df <- rbind(parms_est_df, Invert_est)
   }
   return(parms_est_df)

@@ -49,8 +49,8 @@ Parms2Estimate$LMA<-Parms2Estimate$EWT  <- c('EWT','LMA')
 
 N_prior <- Get_Nprior(SpecPROSPECT = SpecPROSPECT, 
                       lambda = lambda, 
-                      Refl = Refl, 
-                      Tran = NULL,
+                      Refl = NULL, 
+                      Tran = Tran,
                       OptWL_R = list(NIR = 800, SWIR = 1131),  
                       OptWL_T = list(NIR = 753, SWIR = 1121))
 InitValues<-list()

@@ -59,7 +59,7 @@ SpectralDomain$EWT_LMA <- list('minWL' = 1300, 'maxWL' = 2400)
 ParmsEstInv <- list()
 ParmsEstInv$CHL_CAR <- c('CHL', 'CAR','ANT', 'EWT', 'LMA')
 ParmsEstInv$EWT_LMA <- c('EWT', 'LMA')
-N_prior <- Get_Nprior(SpecPROSPECT = SpecPROSPECT, lambda = lambda, Refl = Reflectance, Tran = NULL)
+N_prior <- Get_Nprior(SpecPROSPECT = SpecPROSPECT, lambda = lambda, Refl = NULL, Tran = Transmittance)
 
 
 # define parameters to estimate during inversion
