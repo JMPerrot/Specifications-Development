@@ -9,7 +9,7 @@ spectral range :
 
 -[1300-2400] nm for equivalent water thickness (EWT) and leaf mass per area (LMA)
                  
-<img src="https://user-images.githubusercontent.com/101126884/180430522-05cb82e2-94ec-4c9c-839a-479ea0ef6d7a.png" width="500" height="500">
+<img src="https://user-images.githubusercontent.com/101126884/180430522-05cb82e2-94ec-4c9c-839a-479ea0ef6d7a.png" width="250" height="250">
 
 ### Approximative goal
 spectral range : 
@@ -21,11 +21,43 @@ spectral range :
 
 [1300-2400] nm for equivalent water thickness (EWT) and leaf mass per area (LMA)
                  
-<img src="https://user-images.githubusercontent.com/101126884/180439261-c12be332-4d4c-4ff8-bd70-d7b8dfc2f078.png" width="500" height="500">          
+<img src="https://user-images.githubusercontent.com/101126884/180439261-c12be332-4d4c-4ff8-bd70-d7b8dfc2f078.png" width="250" height="250">          
 
 We can observe that we have an improvement in the normalized root mean square error between these two situations. The objective of this repository is to share codes retracing the steps allowing, from the initial situation, to tend towards the optimized situation by using specific wavelengths and not extended spectral ranges
 ## R&T
 
 ### First step : Sampling stepping
 
+<img src="https://user-images.githubusercontent.com/101126884/180441664-f2309ede-4946-4674-ae48-56db45285244.png" width="250" height="250">   
+
 ### Second step : Sampling translation
+
+<img src="https://user-images.githubusercontent.com/101126884/180439261-c12be332-4d4c-4ff8-bd70-d7b8dfc2f078.png" width="250" height="250">   
+
+### Third step : features selection
+
+<img src="https://user-images.githubusercontent.com/101126884/180439261-c12be332-4d4c-4ff8-bd70-d7b8dfc2f078.png" width="250" height="250">   
+
+### Fourth step : gaussian filter application
+
+<img src="https://user-images.githubusercontent.com/101126884/180439261-c12be332-4d4c-4ff8-bd70-d7b8dfc2f078.png" width="250" height="250">   
+
+## R only with prior N estimation
+N is the number of leaf structure in the plate leaf model
+### First step : Sampling stepping
+
+### Second step : Sampling translation
+
+### Third step : features selection
+
+### Fourth step : gaussian filter application
+
+## T only with prior N estimation
+
+### First step : Sampling stepping
+
+### Second step : Sampling translation
+
+### Third step : features selection
+
+### Fourth step : gaussian filter application
