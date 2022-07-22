@@ -27,7 +27,7 @@ source('../../Libraries/Lib_Plots.R')
 # input output directories
 ################################################################################
 PathData <- '../../../01_DATA'
-PathResults <- '../../../03_RESULTS/R_only_N_Prior'
+PathResults <- '../../../03_RESULTS/T_only_N_Prior'
 PathSRF <- file.path(PathResults,'05_SRF')
 dir.create(path = PathSRF,showWarnings = F,recursive = T)
 
@@ -49,16 +49,16 @@ nbSamples <- ncol(Reflectance)
 ################################################################################
 # Perform PROSPECT inversion using simulated spectral configuration
 ################################################################################
-List_FWHM <- list(1,2,3,4,5,6,7,8,9,10,12,13,15,17,18,20)
+List_FWHM <- list(1,2,3,4,5,10,15,20)
 # save results
 DirSave_Root <- file.path(PathSRF,'SRF_fwhm_')
 
 #component's wavelenghts
 wavelenght<-list()
-wavelenght$CHL <- c(714,849)
-wavelenght$CAR <- c(809,731,549,523)
-wavelenght$EWT <- c(1393)
-wavelenght$LMA <- c(1885,1729)
+wavelenght$CHL <- c(751,712)
+wavelenght$CAR <- c(879,719,559,519)
+wavelenght$EWT <- c(1969,1876,2248,1442)
+wavelenght$LMA <- c(2197,1768,1885,1495,2275)
 
 
 Parms2Estimate<-list()
@@ -79,8 +79,8 @@ for (i in c(1:nbSamples)) {
 List_FWHM_to_do <- list()
 for (fwhm in List_FWHM){
   SRF_Dir <- paste(DirSave_Root, as.character(fwhm), 'nm',sep = '')
-  if (!file.exists(file.path(PathSRF,paste("CHL","_SRF", sep = ''),paste("fwhm_",fwhm,".RData", sep = "")))){
-     List_FWHM_to_do<- append(List_FWHM_to_do,fwhm)
+  if (!file.exists(file.path(SRF_Dir,"Results_Invert_PROSPECT.RData"))){
+    List_FWHM_to_do<- append(List_FWHM_to_do,fwhm)
   }
 }
 
@@ -89,42 +89,42 @@ for (fwhm in List_FWHM_to_do) {
     Invert_est<-list()
     FilePath <- file.path(PathSRF,paste(parm,'_SRF', sep = ''))
     dir.create(path = FilePath,showWarnings = F,recursive = T)
-      minWL <- min(lambda)
-      maxWL <- max(lambda)
-      # define spectral sampling based on minWL, minWL_OUT, FWHM
-      wl <- wavelenght[[parm]]                          #wavelength range
-      SpectralProps <- data.frame('wl'= unlist(wl),'fwhm'=fwhm)#wl group by fwhm in data.frame
-      SensorName <-paste(parm,'_Filter_',fwhm,sep='')
-      SRF <- prosail::GetRadiometry(SpectralProps = SpectralProps,
-                                    SensorName = SensorName,
-                                    Path_SensorResponse = SRF_Dir,
-                                    SaveSRF = FALSE)
-      # Inversion
-      SpecPROSPECT_Sensor <- data.frame(prosail::applySensorCharacteristics(wvl = SpecPROSPECT$lambda,
-                                                                            InRefl = SpecPROSPECT,
-                                                                            SRF = SRF))
-      RT_filter <- gaussian_filter(SRF = SRF,
-                                   lambda = lambda,
-                                   Refl=Reflectance,
-                                   Tran=Transmittance)
-      message(paste('FWHM = ',fwhm, parm))
-      pb <- progress::progress_bar$new(
-        format = "PROSPECT inversion [:bar] :percent in :elapsedfull",
-        total = nbSamples, clear = FALSE, width= 100)
-      for (i in 1:nbSamples) {                                         #filtered reflectance-transmittance list
-        pb$tick()
-        Rtmp <- RT_filter$Refl[,i]
-        Ttmp <- NULL
-        Invert <- Invert_PROSPECT(SpecPROSPECT =  SpecPROSPECT_Sensor,
-                                      Refl = Rtmp,
-                                      Tran = Ttmp,
-                                      Parms2Estimate = Parms2Estimate[[parm]],
-                                      PROSPECT_version = 'D',
-                                      InitValues = InitValues[[i]],)
-        Invert_est<-rbind(Invert_est,Invert)
-      }
-      save(Invert_est, file = file.path(PathSRF,paste(parm,"_SRF", sep = ""),paste("fwhm_",fwhm,".RData", sep = "")))
+    minWL <- min(lambda)
+    maxWL <- max(lambda)
+    # define spectral sampling based on minWL, minWL_OUT, FWHM
+    wl <- wavelenght[[parm]]                          #wavelength range
+    SpectralProps <- data.frame('wl'= unlist(wl),'fwhm'=fwhm)#wl group by fwhm in data.frame
+    SensorName <-paste(parm,'_Filter_',fwhm,sep='')
+    SRF <- prosail::GetRadiometry(SpectralProps = SpectralProps,
+                                  SensorName = SensorName,
+                                  Path_SensorResponse = SRF_Dir,
+                                  SaveSRF = FALSE)
+    # Inversion
+    SpecPROSPECT_Sensor <- data.frame(prosail::applySensorCharacteristics(wvl = SpecPROSPECT$lambda,
+                                                                          InRefl = SpecPROSPECT,
+                                                                          SRF = SRF))
+    RT_filter <- gaussian_filter(SRF = SRF,
+                                 lambda = lambda,
+                                 Refl=Reflectance,
+                                 Tran=Transmittance)
+    message(paste('FWHM = ',fwhm, parm))
+    pb <- progress::progress_bar$new(
+      format = "PROSPECT inversion [:bar] :percent in :elapsedfull",
+      total = nbSamples, clear = FALSE, width= 100)
+    for (i in 1:nbSamples) {                                         #filtered reflectance-transmittance list
+      pb$tick()
+      Rtmp <- NULL
+      Ttmp <- RT_filter$Tran[,i]
+      Invert <- Invert_PROSPECT(SpecPROSPECT =  SpecPROSPECT_Sensor,
+                                Refl = Rtmp,
+                                Tran = Ttmp,
+                                Parms2Estimate = Parms2Estimate[[parm]],
+                                PROSPECT_version = 'D',
+                                InitValues = InitValues[[i]],)
+      Invert_est<-rbind(Invert_est,Invert)
     }
+    save(Invert_est, file = file.path(PathSRF,paste(parm,"_SRF", sep = ""),paste("fwhm_",fwhm,".RData", sep = "")))
+  }
 }
 
 
@@ -141,7 +141,7 @@ for (fwhm in List_FWHM_to_do) {
 #
 #   plots<-scatter_inversion(target = Biochemistry$CHLa+Biochemistry$CHLb,
 #                            estimate = PROSPECT_inversion$CHL,
-#                            Labs = c("Mesured CHL (µg/cm²)","Estimated CHL (µg/cm²)"),
+#                            Labs = c("Mesured CHL (Âµg/cmÂ²)","Estimated CHL (Âµg/cmÂ²)"),
 #                            categories = T,
 #                            Colors = "#66CC00",
 #                            PlotStats = T,
@@ -158,28 +158,28 @@ for (fwhm in List_FWHM_to_do) {
 ################################################################################
 # results data paths
 ################################################################################
-pathdata1 <- "../../../03_RESULTS/R_only_N_Prior/05_SRF/"
+pathdata1 <- "../../../03_RESULTS/T_only_N_Prior/05_SRF/"
 
 nrmse_df = list()#data.frame("parm" = NA, "fwhm"=NA, "nrmse" = NA)
 
 for(parm in c("CHL","CAR","EWT","LMA")){
   pathdata3 <- paste(pathdata1,parm,"_SRF/", sep = "")
-  for (i in List_FWHM) {
+  for (i in c(1,2,3,4,5,10,15,20)) {
     pathdata4 <- paste('fwhm_',as.character(i),'.RData', sep = "")
     pathdata01 <- paste(pathdata3,pathdata4,sep = "")
-
+    
     load(pathdata01)
-  
+    
     nrmse = unlist(get_performances_inversion(target = Biochemistry[[parm]],
-                                                          estimate = Invert_est[[parm]],
-                                                          categories = T)[3])
+                                              estimate = Invert_est[[parm]],
+                                              categories = T)[3])
     nrmse_df[[parm]]<-rbind(nrmse_df[[parm]],unname(nrmse))
     
   }
 }
 # nrmse_df <- nrmse_df[-c(1),]
 
-nrmse_df$fwhm <- List_FWHM
+nrmse_df$fwhm<-c(1,2,3,4,5,10,15,20)
 nrmse_df<-as.data.frame(nrmse_df)
 
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")

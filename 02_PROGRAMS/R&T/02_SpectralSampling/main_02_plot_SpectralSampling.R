@@ -35,7 +35,7 @@ load(PathLOPdb)
 
 ## compute statistics ----------------------------------------------------------
 
-Parms2Estimate <- c('CHL','CAR','EWT','LMA')#
+Parms2Estimate <- c('CHL','CAR','EWT','LMA')
 Stats_inversion_Ref <- Stats_inversion_SS <- list()
 for (parm in Parms2Estimate){
   # load reference#1 for inversion

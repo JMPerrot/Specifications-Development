@@ -32,7 +32,7 @@ dir.create(path = SpectralSampling_Dir,
 dbName <- 'ANGERS'
 PathLOPdb <- file.path(PathData,dbName,'LeafOptics.RData')
 load(PathLOPdb)
-lambda <- Reflectance$V1
+lambda <- Reflectance[,1]
 Reflectance <- Reflectance[,-1]
 Transmittance <- Transmittance[,-1]
 
@@ -139,7 +139,7 @@ for (parm in names(Estimate_SpectralSampling)){
 # plot results
 PlotCols <- list('CHL' = "#66CC00", 'CAR' = "orange", 'LMA' = "red", 'EWT' = "blue")
 MinMax <- list('CHL' = c(0,120), 'CAR'  = c(0,30), 'LMA' = c(0,40), 'EWT' = c(0,60))
-UnitsParms <- list('CHL'='(µg/cm²)', 'CAR'='(µg/cm²)', 'EWT'='(mg/cm²)', 'LMA'='(mg/cm²)')
+UnitsParms <- list('CHL'='(?g/cm?)', 'CAR'='(?g/cm?)', 'EWT'='(mg/cm?)', 'LMA'='(mg/cm?)')
 Factor <- list('CHL'=1, 'CAR'=1, 'EWT'=1000, 'LMA'=1000)
 PlotObj <- list()
 for (parm in names(Estimate_SpectralSampling)){

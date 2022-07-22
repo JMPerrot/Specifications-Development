@@ -43,8 +43,8 @@ Transmittance <- Transmittance[,-1]
 
 # Define parameters for inversion ----------------------------------------------
 
-Parms2Estimate <- c('EWT','LMA','CHL','CAR')#
-Parms2Estimate_ind <- list('CHL'=c('CHL'),'EWT'= 'EWT','LMA'=c('LMA'),'CAR'=c('CAR'))#
+Parms2Estimate <- c('EWT','LMA','CHL','CAR')
+Parms2Estimate_ind <- list('CHL'=c('CHL'),'EWT'= 'EWT','LMA'=c('LMA'),'CAR'=c('CAR'))
 
 Stats<-list()
 Opt_Sampling<-list()
@@ -80,7 +80,7 @@ InitValues <- data.frame(CHL=40, CAR=10, ANT=0.1, BROWN=0, EWT=0.01, LMA=0.01, N
 # Perform inversion ------------------------------------------------------------
 
 # for each parameter
-nbWorkers <- 4
+nbWorkers <- 4 # number of core
 registerDoFuture()
 plan(multisession, workers = nbWorkers)
 Estimate_SpectralShifting <- list()
@@ -92,7 +92,7 @@ for (parm in Parms2Estimate){
   print(parm)
   # apply multiprocessing for each spectral sampling
   Invert_SpectralShifting <- function() {
-    foreach(subshifting = c(0:max(unlist(minlambda)))) %dopart% {#minlambda[[parm]]) %dopar% {
+    foreach(subshifting = c(0:max(unlist(minlambda)))) %dopart% {
       SpectralDomain <- Invert_est <- list()
       SpectralDomain$CHL<-SpectralDomain$CAR <- list('minWL' = 400 + subshifting, 'maxWL' = 900) 
       SpectralDomain$EWT<-SpectralDomain$LMA <- list('minWL' = 1300+subshifting, 'maxWL' = 2400)
