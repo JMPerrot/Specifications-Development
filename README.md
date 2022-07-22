@@ -4,6 +4,7 @@ The PROSPECT Model is used with ANGERS database to simulate different configurat
 ## Reference : Initial situation and goal
 ### Initial situation
 spectral range : [400-900] nm for chlorophyll (CHL) and carotenoid (CAR)
+
                  [1300-2400] nm for equivalent water thickness (EWT) and leaf mass per area (LMA)
                  
 <img src="https://user-images.githubusercontent.com/101126884/180430522-05cb82e2-94ec-4c9c-839a-479ea0ef6d7a.png" width="500" height="500">
