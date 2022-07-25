@@ -40,7 +40,7 @@ We can observe that we have an improvement in the normalized root mean square er
 
 ### Fourth step : gaussian filter application
 
-<img src="https://user-images.githubusercontent.com/101126884/180441997-f5215297-6bc1-4db8-94e2-a4af1d866f81.png" width="250" height="250">   
+<img src="https://user-images.githubusercontent.com/101126884/180789867-77e61247-630a-4474-9a6c-c8dafbb38d9e.png" width="250" height="250">   
 
 ## R only with prior N estimation
 N is the number of leaf structure in the plate leaf model
@@ -59,7 +59,7 @@ N is the number of leaf structure in the plate leaf model
 
 ### Fourth step : gaussian filter application
 
-<img src="https://user-images.githubusercontent.com/101126884/180789867-77e61247-630a-4474-9a6c-c8dafbb38d9e.png" width="250" height="250">   
+<img src="" width="250" height="250">   
 
 ## T only with prior N estimation
 
