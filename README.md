@@ -59,7 +59,7 @@ N is the number of leaf structure in the plate leaf model
 
 ### Fourth step : gaussian filter application
 
-<img src="" width="250" height="250">   
+<img src="https://user-images.githubusercontent.com/101126884/181022754-c82b23d5-142e-4bc4-ba98-86400d7e94aa.png" width="250" height="250">   
 
 ## T only with prior N estimation
 
