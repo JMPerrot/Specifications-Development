@@ -31,17 +31,26 @@ We can observe that we have an improvement in the normalized root mean square er
 
 ### First step : Sampling stepping
 
+the first step is to downsample the spectral ranges by gradually increasing the step. The NRMSE will be calculated to quantify the quality of the estimates.
+
 <img src="https://user-images.githubusercontent.com/101126884/180441664-f2309ede-4946-4674-ae48-56db45285244.png" width="250" height="250">   
 
 ### Second step : Sampling translation
+
+The second step will be to drag the sampling comb over the spectral range using the step minimizing the NRMSE in the first step.
+The goal is to see if there is more relevant information between two wavelengths than that obtained in the first step.
 
 <img src="https://user-images.githubusercontent.com/101126884/180441864-b0ab02b3-f158-411d-8f45-788fb4adbcf4.png" width="250" height="250">   
 
 ### Third step : features selection
 
+The third step consists in carrying out a selection among the wavelengths constituting the sampling comb in the second step. We will therefore start from all the wavelengths (N wavelengths), delete one, calculate the NRMSE, put it back and delete another. We will keep the batch of (N-1) wavelengths and start again until there is only one wavelength left
+
 <img src="https://user-images.githubusercontent.com/101126884/180441928-c20c6130-5cbc-4b90-b72a-9c06693990e9.png" width="250" height="250">   
 
 ### Fourth step : gaussian filter application
+
+In the fourth step, we will apply a Gaussian to the batches of wavelengths identified in step 3. This will make it possible to simulate a source of more or less good resolution. In addition, this will allow us to conclude as to the resolution necessary to have an estimate of acceptable leaf constitution.
 
 <img src="https://user-images.githubusercontent.com/101126884/180789867-77e61247-630a-4474-9a6c-c8dafbb38d9e.png" width="250" height="250">   
 
