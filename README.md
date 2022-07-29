@@ -12,14 +12,16 @@ spectral range :
 <img src="https://user-images.githubusercontent.com/101126884/180430522-05cb82e2-94ec-4c9c-839a-479ea0ef6d7a.png" width="250" height="250">
 
 ### Approximative goal
-spectral range : 
+The approximate objective is defined by the optimized estimation of the PROSPECT inversion. This inversion uses the following spectral ranges for the estimation of the different constituents : 
+
 
 [700-720] nm for chlorophyll (CHL)
 
 
-[-]carotenoid (CAR)
+[520-560] nm carotenoid (CAR)
 
-[1300-2400] nm for equivalent water thickness (EWT) and leaf mass per area (LMA)
+
+[1700-2400] nm for equivalent water thickness (EWT) and leaf mass per area (LMA)
                  
 <img src="https://user-images.githubusercontent.com/101126884/180439261-c12be332-4d4c-4ff8-bd70-d7b8dfc2f078.png" width="250" height="250">          
 
@@ -59,8 +61,7 @@ N is the number of leaf structure in the plate leaf model
 
 ### Fourth step : gaussian filter application
 
-<img src="https://user-images.githubusercontent.com/101126884/181219760-3c07d3b8-e6a0-4246-a01a-0e37fb8ac041.png" width="250" height="250">   
-
+<img src="https://user-images.githubusercontent.com/101126884/181703139-9193bece-da56-4080-b9b6-7ca9e4d291de.png" width="250" height="250">   
 
 ## T only with prior N estimation
 
