@@ -9,7 +9,7 @@ spectral range :
 
 -[1300-2400] nm for equivalent water thickness (EWT) and leaf mass per area (LMA)
                  
-<img src="https://user-images.githubusercontent.com/101126884/180430522-05cb82e2-94ec-4c9c-839a-479ea0ef6d7a.png" width="250" height="250">
+<img src="https://user-images.githubusercontent.com/101126884/181711347-724ac998-6576-4862-adb7-9f3bdea6c1b5.png" width="250" height="250">
 
 In this case we have the situations from which we will start. We will seek to improve the estimates before degrading the spectral resolution
 ### Approximative goal
