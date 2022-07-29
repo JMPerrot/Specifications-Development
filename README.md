@@ -11,6 +11,7 @@ spectral range :
                  
 <img src="https://user-images.githubusercontent.com/101126884/180430522-05cb82e2-94ec-4c9c-839a-479ea0ef6d7a.png" width="250" height="250">
 
+In this case we have the situations from which we will start. We will seek to improve the estimates before degrading the spectral resolution
 ### Approximative goal
 The approximate objective is defined by the optimized estimation of the PROSPECT inversion. This inversion uses the following spectral ranges for the estimation of the different constituents : 
 
